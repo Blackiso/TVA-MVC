@@ -1,0 +1,28 @@
+
+-Authentication :
+   [POST]   => /api/authentication/login
+	- hanndel login
+	- return new login creds
+
+   [POST]   => /api/authentication/register
+	- Create new user
+	- return new login creds
+   
+   [POST]   => /api/authentication/logout
+	- remove login creds
+
+   [GET]    => /api/authentication/authenticate
+	- return new login creds
+
+-Users :
+   [POST]   => /api/users
+	- Create new user for a company
+
+   [GET]    => /api/users/:company-id
+	- Return all users in the company
+
+   [PATCH]  => /api/users/:uid
+	- Update user info based on user id
+
+   [DELETE] => /api/users/:company-id/:uid
+	- Delete user based on user id
