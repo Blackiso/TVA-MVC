@@ -6,18 +6,24 @@
 			private static $master = 'master_accounts';
 			private static $user = 'user_accounts';
 
-			private static $secret_query = "SELECT secret FROM :table WHERE user_id = :id";
-
 			public static function get_secret($id, $type) {
-				$secret_query = str_replace(':table', self::$$type, self::$secret_query);
-				$secret_query = self::prep_query(['id' => $id], $secret_query);
+				$secret_query = self::select_query_constructor(['secret'], self::$$type, ['user_id' => $id]);
 				$result = self::$database->select($secret_query);
 				return $result['secret'];
 			}
 
-			public static function check_user($password, $email, $type) {
-				return self::$database->check_row(self::$$type, ['email' => $email, 'password' => $password]);
+			public static function get_user_from_email($email, $type) {
+				$columns = ['user_id', 'name', 'email', 'password', 'secret'];
+
+				if (self::$$type == 'master_accounts') {
+					array_push($columns, 'account_type');
+				}else {
+					array_push($columns, 'master_id');
+					array_push($columns, 'blocked');
+				}
+				$qr = self::select_query_constructor($columns, self::$$type, ['email' => $email]);
+				$result = self::$database->select($qr);
+				return $result;
 			}
 		}
-
 	}

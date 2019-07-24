@@ -72,7 +72,6 @@
 		}
 
 		public function select($stm) {
-			echo $stm;
 			$return = $this->query($stm);
 			$return = $return[1]->fetchAll(PDO::FETCH_ASSOC);
 			if (sizeof($return) == 1) $return = $return[0];

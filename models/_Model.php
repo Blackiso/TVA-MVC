@@ -17,6 +17,24 @@
 
 				return $return;
 			}
+
+			protected static function select_query_constructor($culumns, $table, $conditions = null) {
+				$query = "SELECT :culumns FROM :table";
+				$culumns = implode(',', $culumns);
+				$query = str_replace(':culumns', $culumns, $query);
+				$query = str_replace(':table', $table, $query);
+				if ($conditions !== null) {
+					$cond = " WHERE ";
+					$arr = [];
+					foreach ($conditions as $key => $value) {
+						$x = $key."='".$value."'";
+						array_push($arr, $x);
+					}
+					$query = $query.$cond.implode(' AND ', $arr);
+
+				}
+				return $query;
+			}
 		}
 
 	}
