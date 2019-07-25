@@ -78,6 +78,14 @@
 			return $return;
 		}
 
+		public function insert($stm) {
+			$return = $this->query($stm);
+			$result = (object)array();
+			$result->insert_id = $this->conn->lastInsertId();
+			$result->query = $return[0];
+			return $result;
+		}
+
 		public function pagination($query, $index = 0, $order = null, $max = 10) {
 			$page_start = $index;
 			$query = $query;

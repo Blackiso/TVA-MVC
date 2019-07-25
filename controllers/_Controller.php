@@ -34,6 +34,21 @@
 			protected static function not_found() {
 				View::not_found();
 			}
+
+			public static function check_data($arr, $keys) {
+				foreach ($keys as $key) {
+					if(!array_key_exists($key, $arr)) {
+						return false;
+					}
+				}
+				foreach ($arr as $key => $value) {
+					if ($value == "" || $value == " ") {
+						return false;
+					}
+				}
+
+				return true;
+			}
 		}
 
 	}

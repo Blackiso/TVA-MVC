@@ -8,17 +8,28 @@
 		
 		private $jwt;
 		private $user_id;
-		private $matser_id;
+		private $master_id;
 		private $password;
 		private $name;
 		private $email;
-		private $type;
+		private $account_type;
 		private $secret;
 		private $user_type;
 		private $blocked;
 
 		function __construct() {
 			User_model::init();
+		}
+
+		public function init_data($data) {
+			$this->user_id = $data->user_id;
+			$this->master_id = $data->user_id;
+			$this->name = $data->name;
+			$this->email = $data->email;
+			$this->account_type = $data->account_type;
+			$this->user_type = $data->user_type;
+			$this->secret = $data->secret;
+			return true;
 		}
 
 		public function init_jwt($key) {
@@ -29,7 +40,7 @@
 				$this->master_id = $data->mid;
 				$this->name = $data->nam;
 				$this->email = $data->eml;
-				$this->type = $data->typ;
+				$this->account_type = $data->typ;
 				$this->user_type = $this->master_id == $this->user_id ? 'master' : 'user';
 				return true;
 			}
@@ -47,12 +58,28 @@
 				$this->name = $data->name;
 				$this->email = $data->email;
 				$this->password = $data->password;
-				$this->type = $data->account_type ?? null;
+				$this->account_type = $data->account_type ?? null;
 				$this->blocked = $data->blocked ?? null;
 				return true;
 			}else {
 				return false;
 			}
+		}
+
+		public function generate_jwt($revoke = true) {
+			if ($revoke) $this->secret = $this->revoke_secret();
+			$payload = (object) array();
+			$payload->uid = $this->user_id;
+			$payload->mid = $this->master_id;
+			$payload->nam = $this->name;
+			$payload->eml = $this->email;
+			$payload->typ = $this->account_type;
+			return $this->sign_JWT($payload, $this->secret);
+		}
+
+		private function revoke_secret() {
+			$this->secret = $this->revoke_key($this->secret);
+			$this->update_user(['secret' => $this->secret]);
 		}
 
 		private function check_data($data) {
@@ -88,10 +115,24 @@
 			return User_model::get_user_from_email($this->email, $this->user_type);
 		}
 
+		public function update_user($updates) {
+			return User_model::update_user($updates, $this->user_type, $this->user_id);
+		}
+
 		private function get_secret() {
 			if ($this->secret == null) {
 				return $this->secret = User_model::get_secret($this->user_id, $this->user_type);
 			}
 			return $this->secret;
+		}
+
+		private function get_info() {
+			$info = [
+				'user_id' => $this->user_id,
+				'name' => $this->name,
+				'email' => $this->email,
+				'type' => $this->account_type
+			];
+			return $info;
 		}
 	}

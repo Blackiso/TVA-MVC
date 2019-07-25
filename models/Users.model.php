@@ -6,6 +6,12 @@
 			private static $master = 'master_accounts';
 			private static $user = 'user_accounts';
 
+			public static function update_user($updates, $type, $id) {
+				$secret_query = self::update_query_constructor($updates, self::$$type, ['user_id' => $id]);
+				$result = self::$database->insert($secret_query);
+				return $result;
+			}
+
 			public static function get_secret($id, $type) {
 				$secret_query = self::select_query_constructor(['secret'], self::$$type, ['user_id' => $id]);
 				$result = self::$database->select($secret_query);

@@ -38,7 +38,7 @@
 			}
 		}
 
-		public function revoke_JWT($key) {
+		public function revoke_key($key) {
 			$key = explode("-", $key);
 			$new_key = uniqid("KY");
 			$key[1] = $new_key;
