@@ -29,9 +29,8 @@
 					$user_data->password = self::encrypt_password($user_data->password, $secret);
 					if ($user_data->password == $user->__get('password')) {
 						if ($user->__get('blocked') == true) View::throw_error(self::$errors['account_blocked']);
-						$jwt = $user->generate_jwt();
+						$user->new_jwt();
 						$info = $user->__get('info');
-						$user->insert_JWT($jwt);
 						View::response($info);
 					}else {
 						self::auth_error();
@@ -84,20 +83,23 @@
 					$user_data->user_type = 'matser';
 					$user_data->secret = $secret;
 					if ($user->init_data($user_data)) {
-						$jwt = $user->generate_jwt(false);
+						$user->new_jwt(false);
 						$info = $user->__get('info');
-						$user->insert_JWT($jwt);
 						View::response($info);
 					}
 				}
 			}
 
 			protected static function post_logout() {
-				
+				self::$user->revoke_secret();
+				self::$user->remove_JWT();
+				View::response();
 			}
 
-			protected static function get_autenticate() {
-				
+			protected static function get_authenticate() {
+				self::$user->new_jwt();
+				$info = self::$user->__get('info');
+				View::response($info);
 			}
 
 			private static function encrypt_password($pass, $secret) {

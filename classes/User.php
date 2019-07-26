@@ -67,18 +67,18 @@
 		}
 
 		public function generate_jwt($revoke = true) {
-			if ($revoke) $this->secret = $this->revoke_secret();
+			if ($revoke) $this->revoke_secret();
 			$payload = (object) array();
 			$payload->uid = $this->user_id;
 			$payload->mid = $this->master_id;
 			$payload->nam = $this->name;
 			$payload->eml = $this->email;
 			$payload->typ = $this->account_type;
-			return $this->sign_JWT($payload, $this->secret);
+			return $this->sign_JWT($payload, $this->get_secret());
 		}
 
-		private function revoke_secret() {
-			$this->secret = $this->revoke_key($this->secret);
+		public function revoke_secret() {
+			$this->secret = $this->revoke_key($this->get_secret());
 			$this->update_user(['secret' => $this->secret]);
 		}
 
@@ -109,6 +109,11 @@
 			if (property_exists($this, $name)) {
 				$this->$name = $value;
 			}
+		}
+
+		public function new_jwt($revoke = true) {
+			$jwt = $this->generate_jwt($revoke);
+			$this->insert_JWT($jwt);
 		}
 
 		public function get_user_from_email() {

@@ -68,7 +68,7 @@
 		}
 
 		private function cookie($name) {
-			return $_COOKIE[$name];
+			return $_COOKIE[$name] ?? null;
 		}
 
 	}

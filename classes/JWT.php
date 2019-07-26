@@ -28,7 +28,6 @@
 			$old_key = explode('.', $old_key);
 			$header = $this->decode($old_key[0]);
 			$signiture = $old_key[2];
-
 			$data = $old_key[0].".".$old_key[1];
 			$new_signiture = hash_hmac($header->alg, $data, $secret);
 			if ($new_signiture == $signiture) {

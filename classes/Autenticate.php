@@ -9,19 +9,21 @@
 		function __construct($request) {
 			$this->request = $request;
 			$this->jwt = $this->request->__get('JWT');
+			$this->user = new User();
 			$this->authenticate();
 		}
 
-		private function authenticate() {		
-			$this->user = new User();
-			if ($this->user->init_jwt($this->jwt)) {
+		private function authenticate() {
+			try {
+				if(!$this->user->init_jwt($this->jwt)) throw new Exception();
 				$secret = $this->user->__get('secret');
-				if ($this->user->verify_JWT($this->jwt, $secret)) {
-					$this->is_auth = true;
-				}else {
-					$this->is_auth = false;
+				if(!$this->user->verify_JWT($this->jwt, $secret)) throw new Exception();
+				if($this->user->exp_check_JWT($this->jwt)) throw new Exception();
+				if(!$this->user->check_renew($this->jwt)) {
+					$this->user->new_jwt();
 				}
-			}else {
+				$this->is_auth = true;
+			} catch (Exception $e) {
 				$this->is_auth = false;
 			}
 		}
