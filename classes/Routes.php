@@ -2,6 +2,7 @@
 
 	abstract class Routes {
 		
+		private $params = [];
 		private $routes = [
 			[
 				'uri' => '/api/authentication/login',
@@ -36,14 +37,14 @@
 				'controller' => 'Users',
 				'action' => null,
 				'auth' => true,
-				'types' => ['master']
+				'types' => ['premium']
 			],
 			[
-				'uri' => '/api/users/:user',
+				'uri' => '/api/users/:company-id',
 				'controller' => 'Users',
-				'action' => 'user',
+				'action' => 'all_users',
 				'auth' => true,
-				'types' => ['master']
+				'types' => ['premium']
 			]
 		];
 
@@ -54,6 +55,10 @@
 					return $route;
 				}
 			}
+		}
+
+		protected function get_params_() {
+			return $this->params;
 		}
 
 		private function uri_to_arr($uri) {
@@ -69,10 +74,15 @@
 			foreach ($pattern as $i => $item) {
 				if (preg_match('/^(:)/', $item)) {
 					$pattern[$i] = $uri[$i];
+					$this->set_params(ltrim($item, ':'), $uri[$i]);
 				}
 			}
 			array_unshift($pattern, '');
 			return implode('/', $pattern);
+		}
+
+		private function set_params($key, $val) {
+			$this->params[$key] = $val;
 		}
 
 		private function clear_empty($arr) {

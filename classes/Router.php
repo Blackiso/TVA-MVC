@@ -35,7 +35,11 @@
 			return $this->route['action'];
 		}
 
+		private function get_types() {
+			return $this->route['types'];
+		}
+
 		private function get_params() {
-			return $this->route['action'];
+			return $this->get_params_();
 		}
 	}

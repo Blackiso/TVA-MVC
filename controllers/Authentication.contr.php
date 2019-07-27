@@ -4,17 +4,7 @@
 		use Views\View as View;
 		use Models\Authentication as AuthModel;
 
-		class Authentication extends Controller  {
-
-			private static $encryption = 'sha256';
-			private static $pass_regex = '/^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z\d@$!%*#?é^&â ]{5,20}$/';
-
-			private static $errors = [
-				'password' => 'Password Requires a Mix of Numbers and Letters Min Characters 5 and Max Characters 20',
-				'email_used' => 'Email already used!',
-				'account_blocked' => 'Your account is blocked!',
-				'authentication' => 'Authentication Error!'
-			]; 
+		class Authentication extends Controller  { 
 
 			protected static function post_login() {
 				$user_data = self::$request->__get('body');
@@ -28,7 +18,7 @@
 					$secret = $user->__get('secret');
 					$user_data->password = self::encrypt_password($user_data->password, $secret);
 					if ($user_data->password == $user->__get('password')) {
-						if ($user->__get('blocked') == true) View::throw_error(self::$errors['account_blocked']);
+						if ($user->__get('blocked') == true) View::throw_error('account_blocked');
 						$user->new_jwt();
 						$info = $user->__get('info');
 						View::response($info);
@@ -56,11 +46,11 @@
 				}
 
 				if (AuthModel::check_email_exist($user_data->email)) {
-					View::throw_error(self::$errors['email_used']);
+					View::throw_error('email_used');
 				}
 
-				if (!preg_match(self::$pass_regex, $user_data->password)) {
-					View::throw_error(self::$errors['password']);
+				if (!self::filter_password($user_data->password)) {
+					View::throw_error('password');
 				}
 
 				$secret = self::generate_secret($user_data->email);
@@ -85,7 +75,7 @@
 					if ($user->init_data($user_data)) {
 						$user->new_jwt(false);
 						$info = $user->__get('info');
-						View::response($info);
+						View::created($info);
 					}
 				}
 			}
@@ -102,24 +92,8 @@
 				View::response($info);
 			}
 
-			private static function encrypt_password($pass, $secret) {
-				$secret = explode('-', $secret)[0];
-				return hash_hmac(self::$encryption, $pass, $secret);
-			}
-
-			private static function generate_secret($salt) {
-				$rand_num = time();
-				$secret = hash_hmac('sha256', $salt, $rand_num);
-				$add_secret = uniqid("KY");
-				return $secret."-".$add_secret;
-			}
-
-			private static function check_email($email) {
-				return filter_var($email, FILTER_VALIDATE_EMAIL);
-			}
-
 			private static function auth_error() {
-				View::throw_error(self::$errors['authentication']);
+				View::throw_error('authentication');
 			}
 		}
 	}

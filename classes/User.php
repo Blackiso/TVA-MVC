@@ -1,6 +1,6 @@
 <?php
 	
-	use Models\User as User_model;
+	use Models\Authentication as Auth_model;
 
 	require_once('JWT.php');
 	
@@ -18,7 +18,7 @@
 		private $blocked;
 
 		function __construct() {
-			User_model::init();
+			Auth_model::init();
 		}
 
 		public function init_data($data) {
@@ -117,16 +117,16 @@
 		}
 
 		public function get_user_from_email() {
-			return User_model::get_user_from_email($this->email, $this->user_type);
+			return Auth_model::get_user_from_email($this->email, $this->user_type);
 		}
 
 		public function update_user($updates) {
-			return User_model::update_user($updates, $this->user_type, $this->user_id);
+			return Auth_model::update_user($updates, $this->user_type, $this->user_id);
 		}
 
 		private function get_secret() {
 			if ($this->secret == null) {
-				return $this->secret = User_model::get_secret($this->user_id, $this->user_type);
+				return $this->secret = Auth_model::get_secret($this->user_id, $this->user_type);
 			}
 			return $this->secret;
 		}

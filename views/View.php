@@ -2,14 +2,21 @@
 	namespace Views {
 		class View {
 
-			public function json($data) {
+			private static $errors = [
+				'password' => 'Password Requires a Mix of Numbers and Letters Min Characters 5 and Max Characters 20',
+				'email_used' => 'Email already used!',
+				'account_blocked' => 'Your account is blocked!',
+				'authentication' => 'Authentication Error!'
+			];
+
+			public static function json($data) {
 				return json_encode($data, JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES);
 			}
 
 			public static function throw_error($err, $code = null) {
 				if (gettype($err) == "string") {
 					$err = [
-						"error" => $err,
+						"error" => self::$errors[$err],
 						"exit" => false,
 						"code" => $code
 					];

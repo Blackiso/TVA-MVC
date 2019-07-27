@@ -6,24 +6,23 @@
 		abstract class Controller {
 
 			private static $default = 'index';
+			private static $pass_regex = '/^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z\d@$!%*#?é^&â ]{5,20}$/';
+			private static $encryption = 'sha256';
 			protected static $user;
 			protected static $request;
-			
+			protected static $params;
+				
 			public static function init($request, $user, $controller, $action, $params) {
 				\Models\Model::init();
 				self::$request = $request;
 				self::$user = $user;
-
-				if ($action !== null) {
-					$action = self::construct_action($action);
-
-					if (method_exists($controller, $action)) {
-						$controller::$action();
-					}else {
-						self::not_found();
-					}
+				self::$params = $params;
+				$action = $action ?? self::$default;
+				$action = self::construct_action($action);
+				if (method_exists($controller, $action)) {
+					$controller::$action();
 				}else {
-					$controller::$default();
+					self::not_found();
 				}
 			}
 
@@ -35,7 +34,14 @@
 				View::not_found();
 			}
 
+			protected static function filter_password($pass) {
+				return preg_match(self::$pass_regex, $pass);
+			}
+
 			public static function check_data($arr, $keys) {
+				if ($arr == null || gettype($arr) !== 'object') {
+					return false;
+				}
 				foreach ($keys as $key) {
 					if(!array_key_exists($key, $arr)) {
 						return false;
@@ -48,6 +54,26 @@
 				}
 
 				return true;
+			}
+
+			protected static function clear_str($str) {
+				return addslashes(strip_tags($str));
+			}
+
+			protected static function encrypt_password($pass, $secret) {
+				$secret = explode('-', $secret)[0];
+				return hash_hmac(self::$encryption, $pass, $secret);
+			}
+
+			protected static function generate_secret($salt) {
+				$rand_num = time();
+				$secret = hash_hmac('sha256', $salt, $rand_num);
+				$add_secret = uniqid("KY");
+				return $secret."-".$add_secret;
+			}
+
+			protected static function check_email($email) {
+				return filter_var($email, FILTER_VALIDATE_EMAIL);
 			}
 		}
 

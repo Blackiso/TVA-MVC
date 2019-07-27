@@ -33,6 +33,9 @@
 				if (self::$router->__get('auth') !== false) {
 					self::$authenticate = new Authenticate(self::$request);
 					if (self::$authenticate->__get('is_auth')) {
+						if(!self::$authenticate->check_user_type(self::$router->__get('types'))) {
+							Views\View::unauthorized();
+						}
 						self::$user = self::$authenticate->__get('user');
 						self::controller();
 					}else {

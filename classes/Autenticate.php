@@ -19,12 +19,21 @@
 				$secret = $this->user->__get('secret');
 				if(!$this->user->verify_JWT($this->jwt, $secret)) throw new Exception();
 				if($this->user->exp_check_JWT($this->jwt)) throw new Exception();
-				if(!$this->user->check_renew($this->jwt)) {
+				if($this->user->check_renew($this->jwt)) {
 					$this->user->new_jwt();
 				}
 				$this->is_auth = true;
 			} catch (Exception $e) {
 				$this->is_auth = false;
+			}
+		}
+
+		public function check_user_type($types) {
+			if (empty($types)) return true;
+			if (!in_array($this->user->account_type, $types)) {
+				return false;
+			}else {
+				return true;
 			}
 		}
 
