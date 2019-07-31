@@ -12,22 +12,23 @@
 			protected static $request;
 			protected static $params;
 				
-			public static function init($request, $user, $controller, $action, $params) {
+			public static function init($request, $user, $action, $params) {
 				\Models\Model::init();
 				self::$request = $request;
 				self::$user = $user;
 				self::$params = $params;
 				$action = $action ?? self::$default;
 				$action = self::construct_action($action);
-				if (method_exists($controller, $action)) {
-					$controller::$action();
+
+				if (method_exists(static::class, $action)) {
+					static::$action();
 				}else {
 					self::not_found();
 				}
 			}
 
 			private static function construct_action($action) {
-				return self::$request->__get('method').'_'.$action;
+				return self::$request->method.'_'.$action;
 			}
 
 			protected static function not_found() {

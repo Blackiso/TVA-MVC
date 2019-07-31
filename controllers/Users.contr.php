@@ -7,8 +7,8 @@
 
 		class Users extends Controller  {
 			
-			public static function post_index() {
-				$user_data = self::$request->__get('body');
+			public static function POST_index() {
+				$user_data = self::$request->body;
 				if(!self::check_data($user_data, ['email', 'password', 'companies', 'name'])) {
 					View::bad_request();
 				}
@@ -25,7 +25,7 @@
 					View::throw_error('password');
 				}
 
-				$user_data->master_id = self::$user->__get('user_id');
+				$user_data->master_id = self::$user->user_id;
 				$user_data->name = self::clear_str($user_data->name);
 				$user_data->secret = self::generate_secret($user_data->email);
 				$user_data->password = self::encrypt_password($user_data->password, $user_data->secret);
@@ -43,11 +43,15 @@
 				}
 			}
 
-			public static function get_all_users() {
+			public static function GET_all_users() {
 				$company_id = self::$params['company-id'];
-				$master_id = self::$user->__get('master_id');
+				$master_id = self::$user->master_id;
 				$data = UsersModel::get_users_by_company($company_id, $master_id);
 				View::response($data);
+			}
+
+			public static function DELETE_users() {
+				$user_id = self::$params['user-id'];
 			}
 
 			private static function filter_email($email) {

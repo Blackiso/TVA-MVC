@@ -20,23 +20,23 @@
 
 			self::auto_loader();
 			self::$request = new Request();
-			self::$router = new Router(self::$request->__get('uri'));
+			self::$router = new Router(self::$request->uri);
 			self::init_controller();
 		}
 
 		private static function init_controller() {
-			self::$controller = 'Controllers\\'.self::$router->__get('controller');
-			self::$action = self::$router->__get('action');
-			self::$uri_params = self::$router->__get('params');
+			self::$controller = 'Controllers\\'.self::$router->controller;
+			self::$action = self::$router->action;
+			self::$uri_params = self::$router->params;
 			
 			if (class_exists(self::$controller)) {
 				if (self::$router->__get('auth') !== false) {
 					self::$authenticate = new Authenticate(self::$request);
-					if (self::$authenticate->__get('is_auth')) {
-						if(!self::$authenticate->check_user_type(self::$router->__get('types'))) {
+					if (self::$authenticate->is_auth) {
+						if(!self::$authenticate->check_user_type(self::$router->types)) {
 							Views\View::unauthorized();
 						}
-						self::$user = self::$authenticate->__get('user');
+						self::$user = self::$authenticate->user;
 						self::controller();
 					}else {
 						Views\View::not_authenticated();
@@ -51,7 +51,7 @@
 		}
 
 		private static function controller() {
-			self::$controller::init(self::$request, self::$user, self::$controller, self::$action, self::$uri_params);
+			self::$controller::init(self::$request, self::$user, self::$action, self::$uri_params);
 		}
 
 		private static function auto_loader() {

@@ -130,23 +130,6 @@
 			}
 		}
 
-		public function generate_unique_ids($table, $id_name, $num = 1) {
-			$return = array();
-			for ($i = 0; $i < $num; $i++) { 
-				$id  = str_replace(".", "", microtime(true));
-				array_push($return, $id);
-				usleep(3 * 100);
-			}
-			$ids = implode(", ", $return);
-			$check = "SELECT $id_name FROM $table WHERE $id_name IN ($ids)";
-			$result = $this->query($check);
-			if (!empty($result)) {
-				$this->generate_unique_ids($num, $table, $id_name);
-			}else {
-				return $return;
-			}
-		}
-
 		private function db_error($msg) {
 			echo json_encode(array('DB Error' => $msg));
 			exit();

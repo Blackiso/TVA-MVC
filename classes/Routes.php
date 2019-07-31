@@ -45,6 +45,27 @@
 				'action' => 'all_users',
 				'auth' => true,
 				'types' => ['premium']
+			],
+			[
+				'uri' => '/api/users/:user-id/delete',
+				'controller' => 'Users',
+				'action' => 'users',
+				'auth' => true,
+				'types' => ['premium']
+			],
+			[
+				'uri' => '/api/companies',
+				'controller' => 'Companies',
+				'action' => null,
+				'auth' => true,
+				'types' => ['premium']
+			],
+			[
+				'uri' => '/api/companies/:company-id',
+				'controller' => 'Companies',
+				'action' => 'company',
+				'auth' => true,
+				'types' => []
 			]
 		];
 

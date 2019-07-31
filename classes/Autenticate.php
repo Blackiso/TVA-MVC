@@ -38,19 +38,9 @@
 		}
 
 		public function __get($name) {
-			$method = 'get_'.$name;
-			if (method_exists($this, $method)) {
-				return $this->$method();
-			}else {
-				return null;
+			if (property_exists($this, $name)) {
+				return $this->$name;
 			}
-		}
-
-		private function get_user() {
-			return $this->user;
-		}
-
-		private function get_is_auth() {
-			return $this->is_auth;
+			return null;
 		}
 	}

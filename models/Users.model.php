@@ -17,7 +17,7 @@
 			
 			public static function get_users_by_company($company_id, $master_id) {
 				$users_query = self::select_query_constructor(['user_id', 'name', 'email', 'blocked'], self::$user);
-				$users_query = $users_query." WHERE companies REGEXP '(".$company_id.")'";
+				$users_query = $users_query." WHERE companies REGEXP '(?<![0-9])".$company_id."(?![0-9])'";
 				return self::$database->select($users_query);
 			}
 		}

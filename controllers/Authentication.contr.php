@@ -6,8 +6,8 @@
 
 		class Authentication extends Controller  { 
 
-			protected static function post_login() {
-				$user_data = self::$request->__get('body');
+			protected static function POST_login() {
+				$user_data = self::$request->body;
 				$user = new \User();
 
 				if (!self::check_data($user_data, ['email', 'password'])) {
@@ -15,12 +15,12 @@
 				}
 
 				if ($user->init_email($user_data->email)) {
-					$secret = $user->__get('secret');
+					$secret = $user->secret;
 					$user_data->password = self::encrypt_password($user_data->password, $secret);
-					if ($user_data->password == $user->__get('password')) {
-						if ($user->__get('blocked') == true) View::throw_error('account_blocked');
+					if ($user_data->password == $user->password) {
+						if ($user->blocked == true) View::throw_error('account_blocked');
 						$user->new_jwt();
-						$info = $user->__get('info');
+						$info = $user->info;
 						View::response($info);
 					}else {
 						self::auth_error();
@@ -30,12 +30,12 @@
 				}
 			}
 
-			protected static function post_register() {
+			protected static function POST_register() {
 				$user = new \User();
-				$user_ip = self::$request->__get('ip');
-				$user_agent = self::$request->__get('agent');
+				$user_ip = self::$request->ip;
+				$user_agent = self::$request->agent;
 				$account_type = "premium";
-				$user_data = self::$request->__get('body');
+				$user_data = self::$request->body;
 
 				if (!self::check_data($user_data, ['name','email', 'password'])) {
 					View::bad_request();
@@ -74,21 +74,21 @@
 					$user_data->secret = $secret;
 					if ($user->init_data($user_data)) {
 						$user->new_jwt(false);
-						$info = $user->__get('info');
+						$info = $user->info;
 						View::created($info);
 					}
 				}
 			}
 
-			protected static function post_logout() {
+			protected static function POST_logout() {
 				self::$user->revoke_secret();
 				self::$user->remove_JWT();
 				View::response();
 			}
 
-			protected static function get_authenticate() {
+			protected static function GET_authenticate() {
 				self::$user->new_jwt();
-				$info = self::$user->__get('info');
+				$info = self::$user->info;
 				View::response($info);
 			}
 

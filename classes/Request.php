@@ -21,7 +21,9 @@
 
 		public function __get($name) {
 			$method = 'get_'.$name;
-			if (method_exists($this, $method)) {
+			if (property_exists($this, $name)) {
+				return $this->$name;
+			}else if (method_exists($this, $method)) {
 				return $this->$method();
 			}else {
 				return null;
@@ -50,25 +52,24 @@
 			return json_decode($str);
 		}
 
-		private function get_uri() {
+		public function get_uri() {
 			return $this->parsedURI;
 		}
 
-		private function get_method() {
-			return $this->method;
-		}
-
-		private function get_body() {
+		public function get_body() {
 			$entity_body = file_get_contents('php://input');
 			return $this->json_strip_tags(json_decode($entity_body));
 		}
 
-		private function get_JWT() {
+		public function get_JWT() {
 			return $this->cookie('JWT');
 		}
 
-		private function cookie($name) {
+		public function cookie($name) {
 			return $_COOKIE[$name] ?? null;
 		}
 
 	}
+
+
+	// Change All the private / publuc methods and propertys, remove getters and setters wher they dont need to be.

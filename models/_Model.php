@@ -81,6 +81,23 @@
 					return true;
 				}
 			}
+
+			public static function generate_unique_ids($table, $id_name, $num = 1) {
+				$return = array();
+				for ($i = 0; $i < $num; $i++) { 
+					$id  = str_replace(".", "", microtime(true));
+					array_push($return, $id);
+					usleep(3 * 100);
+				}
+				$ids = implode(", ", $return);
+				$check = "SELECT $id_name FROM $table WHERE $id_name IN ($ids)";
+				$result = self::$database->select($check);
+				if (!empty($result)) {
+					$this->generate_unique_ids($num, $table, $id_name);
+				}else {
+					return sizeof($return) > 1 ? $return : $return[0];
+				}
+			}
 		}
 
 	}
