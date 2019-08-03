@@ -53,10 +53,12 @@
 					View::throw_error('password');
 				}
 
+				$user_id = AuthModel::generate_id();
 				$secret = self::generate_secret($user_data->email);
 				$user_data->password = self::encrypt_password($user_data->password, $secret);
 
 				$register_data = [
+					'user_id' => $user_id,
 					'name' => $user_data->name,
 					'email' => $user_data->email,
 					'password' => $user_data->password,
@@ -66,9 +68,8 @@
 					'user_ip' => $user_ip,
 				];
 
-				$register = AuthModel::register_user($register_data);
-				if ($register['registred']) {
-					$user_data->user_id = $register['user_id'];
+				if (AuthModel::register_user($register_data)) {
+					$user_data->user_id = $user_id;
 					$user_data->account_type = $account_type;
 					$user_data->user_type = 'matser';
 					$user_data->secret = $secret;

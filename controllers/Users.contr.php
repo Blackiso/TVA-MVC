@@ -25,21 +25,17 @@
 					View::throw_error('password');
 				}
 
+				$user_data->user_id = UsersModel::generate_id();
 				$user_data->master_id = self::$user->user_id;
 				$user_data->name = self::clear_str($user_data->name);
 				$user_data->secret = self::generate_secret($user_data->email);
 				$user_data->password = self::encrypt_password($user_data->password, $user_data->secret);
 
-				$result = UsersModel::add_user($user_data);
-				if ($result['added']) {
-					$new_user = [
-						"user_id" => $result['user_id'],
-						"name" => $user_data->name,
-						"email" => $user_data->email,
-						"blocked" => false,
-					];
-
-					View::created($new_user);
+				if (UsersModel::add_user($user_data)) {
+					unset($user_data->password);
+					unset($user_data->secret);
+					unset($user_data->master_id);
+					View::created($user_data);
 				}
 			}
 

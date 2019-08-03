@@ -31,37 +31,6 @@
 			}
 		}
 
-		//Delete This...
-		public function _query_($statment) {
-			try {
-				if (gettype($statment) == "array") {
-					$statment = implode(";", $statment);
-					$statment .= ";";
-					$query = $this->conn->prepare($statment);
-					$rs =  $query->execute();
-					return $rs;
-				}
-
-				$query = $this->conn->prepare($statment);
-				$rs =  $query->execute();
-
-				if (preg_match('/^(SELECT)/', $statment)) {
-					$return = $query->fetchAll(PDO::FETCH_ASSOC);
-					if (sizeof($return) == 1) $return = $return[0];
-					return $return;
-				}else if (preg_match('/^(INSERT)/', $statment)) {
-					$result = (object)array();
-					$result->insert_id = $this->conn->lastInsertId();
-					$result->query = $rs;
-					return $result;
-				}else {
-					return $rs;
-				}
-			} catch (PDOException $e) {
-				$this->db_error($e->getMessage());
-			}
-		}
-
 		private function query($stm) {
 			try {
 				$query = $this->conn->prepare($stm);
@@ -110,24 +79,6 @@
 			$result->data = $qr_result;
 			$result->max_index = $this->query("SELECT count(*) as num FROM $last_part")['num'];
 			return $result;
-		}
-
-		public function check_row($table, $conditions) {
-			$qr = "SELECT * FROM $table WHERE ";
-			$i = 0;
-			foreach ($conditions as $key => $value) {
-				$qr .= "$key = '$value' ";
-				if ($i !== sizeof($conditions)-1) $qr .= "AND ";
-				$i++;
-			}
-			
-			$result = $this->select($qr);
-			print_r($result);
-			if (empty($result)) {
-				return false;
-			}else {
-				return true;
-			}
 		}
 
 		private function db_error($msg) {

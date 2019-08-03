@@ -19,11 +19,11 @@
 				self::$params = $params;
 				$action = $action ?? self::$default;
 				$action = self::construct_action($action);
-
+				
 				if (method_exists(static::class, $action)) {
 					static::$action();
 				}else {
-					self::not_found();
+					View::not_found();
 				}
 			}
 
@@ -31,30 +31,28 @@
 				return self::$request->method.'_'.$action;
 			}
 
-			protected static function not_found() {
-				View::not_found();
-			}
-
 			protected static function filter_password($pass) {
 				return preg_match(self::$pass_regex, $pass);
 			}
 
-			public static function check_data($arr, $keys) {
-				if ($arr == null || gettype($arr) !== 'object') {
+			public static function check_data($arr, $keys, $force = true) {
+				if ($arr == null || gettype($arr) !== 'object' || self::has_empty($arr)) {
 					return false;
 				}
-				foreach ($keys as $key) {
-					if(!array_key_exists($key, $arr)) {
-						return false;
+				if ($force) {
+					foreach ($keys as $key) {
+						if(!array_key_exists($key, $arr)) return false;
 					}
 				}
 				foreach ($arr as $key => $value) {
-					if ($value == "" || $value == " ") {
-						return false;
-					}
+					if (!in_array($key, $keys)) return false;
 				}
-
 				return true;
+			}
+
+			protected static function has_empty($array) {
+				$array = (array)$array;
+    			return count($array) != count(array_diff(array_map('serialize', $array), array_map('serialize', [' ', '', null, []])));
 			}
 
 			protected static function clear_str($str) {

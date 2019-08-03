@@ -24,11 +24,37 @@
 				}
 			}
 
+			public static function GET_all() {
+				if (isset(self::$request->querys['last_item'])) {
+					$last_item_page = ['id' => self::$request->querys['last_item']];
+				}else {
+					$last_item_page = null;
+				}
+				$result = CompaniesModel::get_companies(self::$user->master_id, $last_item_page);
+				View::response($result);
+			}
+
 			public static function GET_company() {
 				$company_id = self::$params['company-id'];
 				if (!self::check_company($company_id)) View::bad_request();
 				$response = CompaniesModel::get_company($company_id);
 				View::response($response);
+			}
+
+			public static function PATCH_company_upd() {
+				$company_id = self::$params['company-id'];
+				$data = self::$request->body;
+				if (!self::check_company($company_id)) View::bad_request();
+				if (!self::check_data($data, ['company_name', 'address', 'phone'], false)) View::bad_request();
+				CompaniesModel::update_company($data, $company_id);
+				View::response();
+			}
+
+			public static function DELETE_company_dlt() {
+				$company_id = self::$params['company-id'];
+				if (!self::check_company($company_id)) View::bad_request();
+				CompaniesModel::delete_company($company_id);
+				View::response();
 			}
 
 			private static function check_company($company_id) {

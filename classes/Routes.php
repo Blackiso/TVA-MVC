@@ -58,7 +58,14 @@
 				'controller' => 'Companies',
 				'action' => null,
 				'auth' => true,
-				'types' => ['premium']
+				'types' => ['premium', 'regular']
+			],
+			[
+				'uri' => '/api/companies/all',
+				'controller' => 'Companies',
+				'action' => 'all',
+				'auth' => true,
+				'types' => []
 			],
 			[
 				'uri' => '/api/companies/:company-id',
@@ -66,6 +73,20 @@
 				'action' => 'company',
 				'auth' => true,
 				'types' => []
+			],
+			[
+				'uri' => '/api/companies/:company-id/delete',
+				'controller' => 'Companies',
+				'action' => 'company_dlt',
+				'auth' => true,
+				'types' => ['premium', 'regular']
+			],
+			[
+				'uri' => '/api/companies/:company-id/update',
+				'controller' => 'Companies',
+				'action' => 'company_upd',
+				'auth' => true,
+				'types' => ['premium', 'regular']
 			]
 		];
 

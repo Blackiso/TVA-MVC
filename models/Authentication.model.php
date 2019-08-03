@@ -6,6 +6,10 @@
 			private static $master = 'master_accounts';
 			private static $user = 'user_accounts';
 
+			public static function generate_id() {
+				return self::generate_unique_ids(self::$master, 'user_id');
+			}
+
 			public static function check_email_exist($email) {
 				return self::check_row(self::$master, ['email' => $email]);
 			}
@@ -13,7 +17,7 @@
 			public static function register_user($data) {
 				$register_query = self::insert_query_constructor($data, self::$master);
 				$result = self::$database->insert($register_query);
-				return ['user_id' => $result->insert_id, 'registred' => $result->query];
+				return $result->query;
 			}
 
 			public static function update_user($updates, $type, $id) {
@@ -25,7 +29,7 @@
 			public static function get_secret($id, $type) {
 				$secret_query = self::select_query_constructor(['secret'], self::$$type, ['user_id' => $id]);
 				$result = self::$database->select($secret_query);
-				return $result['secret'];
+				return $result['secret'] ?? null;
 			}
 
 			public static function get_user_from_email($email, $type) {

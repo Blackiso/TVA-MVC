@@ -4,6 +4,7 @@
 		abstract class Model {
 
 			protected static $database;
+			protected static $page_limit = 20;
 
 			public static function init() {
 				self::$database = \Database::get_instence();
@@ -14,7 +15,6 @@
 				foreach ($items as $key => $value) {
 					$return = str_replace(':'.$key, $value, $query);
 				}
-
 				return $return;
 			}
 
@@ -62,6 +62,15 @@
 				return $query;
 			}
 
+			protected static function pagination($columns, $table, $conditions, $last_item) {
+				$select_query = self::select_query_constructor($columns, $table, $conditions);
+				if ($last_item !== null) {
+					$select_query.= " AND ".key($last_item)." > ".array_values($last_item)[0];
+				}
+				$select_query.= " LIMIT ".self::$page_limit;
+				return $select_query;
+			}
+
 			private static function conditions($conditions) {
 				$cond = " WHERE ";
 				$arr = [];
@@ -75,17 +84,18 @@
 			public static function check_row($table, $conditions) {
 				$qr = self::select_query_constructor(['*'], $table, $conditions);
 				$result = self::$database->select($qr);
-				if (empty($result)) {
-					return false;
-				}else {
-					return true;
-				}
+				return empty($result) ? false : true;
+			}
+
+			public static function soft_delete($table, $conditions) {
+				$qr = self::update_query_constructor(['deleted' => 1, 'deletion_time' => time()], $table, $conditions);
+				$result = self::$database->insert($qr);
 			}
 
 			public static function generate_unique_ids($table, $id_name, $num = 1) {
 				$return = array();
 				for ($i = 0; $i < $num; $i++) { 
-					$id  = str_replace(".", "", microtime(true));
+					$id  = explode('.', microtime(true))[0];
 					array_push($return, $id);
 					usleep(3 * 100);
 				}
@@ -93,7 +103,7 @@
 				$check = "SELECT $id_name FROM $table WHERE $id_name IN ($ids)";
 				$result = self::$database->select($check);
 				if (!empty($result)) {
-					$this->generate_unique_ids($num, $table, $id_name);
+					$this->generate_unique_ids($table, $id_name, $num);
 				}else {
 					return sizeof($return) > 1 ? $return : $return[0];
 				}

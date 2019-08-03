@@ -5,6 +5,10 @@
 
 			private static $user = 'user_accounts';
 
+			public static function generate_id() {
+				return self::generate_unique_ids(self::$user, 'user_id');
+			}
+
 			public static function check_email_exist($email) {
 				return self::check_row(self::$user, ['email' => $email]);
 			}
@@ -12,7 +16,7 @@
 			public static function add_user($data) {
 				$user_query = self::insert_query_constructor($data, self::$user);
 				$result = self::$database->insert($user_query);
-				return ['user_id' => $result->insert_id, 'added' => $result->query];
+				return $result->query;
 			}
 			
 			public static function get_users_by_company($company_id, $master_id) {

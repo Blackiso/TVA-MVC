@@ -2,32 +2,45 @@
 
 	class Request {
 
-		private $URI;
+		private $_URI;
 		private $parsedURI;
 		private $querys;
 
 		function __construct() {
-			$this->URI = $_SERVER['REQUEST_URI'];
+			$this->_URI = $_SERVER['REQUEST_URI'];
 			$this->method = $_SERVER['REQUEST_METHOD'];
-			$this->querys = $_SERVER['QUERY_STRING'];
+			$this->querys = $this->parse_querys($_SERVER['QUERY_STRING']);
 			$this->parse_URI();
 		}
 
 		private function parse_URI() {
-			$parsed = explode('&', $this->URI)[0];
+			$parsed = explode('?', $this->_URI)[0];
 			$_parsed = explode('/', $parsed);
 			$this->parsedURI = $parsed;
 		}
 
 		public function __get($name) {
 			$method = 'get_'.$name;
-			if (property_exists($this, $name)) {
-				return $this->$name;
-			}else if (method_exists($this, $method)) {
+			if (method_exists($this, $method)) {
 				return $this->$method();
+			}else if (property_exists($this, $name)) {
+				return $this->$name;
 			}else {
 				return null;
 			}
+		}
+
+		private function parse_querys($str) {
+			if ($str == "" or $str == null) {
+				return null;
+			}
+			$qr_arr = explode('&', $str);
+			$return = [];
+			foreach ($qr_arr as $qr) {
+				$x = explode('=', $qr);
+				$return[$x[0]] = $x[1] ?? null;
+			}
+			return $return; 
 		}
 
 		private function get_ip() {
@@ -70,6 +83,3 @@
 		}
 
 	}
-
-
-	// Change All the private / publuc methods and propertys, remove getters and setters wher they dont need to be.
