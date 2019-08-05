@@ -20,7 +20,7 @@
 
 			self::auto_loader();
 			self::$request = new Request();
-			self::$router = new Router(self::$request->uri);
+			self::$router = new Router(self::$request->uri, self::$request->method);
 			self::init_controller();
 		}
 
@@ -30,7 +30,7 @@
 			self::$uri_params = self::$router->params;
 			
 			if (class_exists(self::$controller)) {
-				if (self::$router->__get('auth') !== false) {
+				if (self::$router->auth !== false) {
 					self::$authenticate = new Authenticate(self::$request);
 					if (self::$authenticate->is_auth) {
 						if(!self::$authenticate->check_user_type(self::$router->types)) {

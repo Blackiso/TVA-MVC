@@ -19,7 +19,7 @@
 				self::$params = $params;
 				$action = $action ?? self::$default;
 				$action = self::construct_action($action);
-				
+
 				if (method_exists(static::class, $action)) {
 					static::$action();
 				}else {
@@ -73,6 +73,16 @@
 
 			protected static function check_email($email) {
 				return filter_var($email, FILTER_VALIDATE_EMAIL);
+			}
+
+			protected static function check_master_company($company_id) {
+				$master_id = self::$user->master_id;
+				return \Models\Companies::check_company($company_id, $master_id);
+			}
+
+			protected static function check_user_company($company_id, $user_id = null) {
+				$user_id = $user_id ?? self::$user->user_id;
+				return \Models\Users::check_user_company($company_id, $user_id);
 			}
 		}
 

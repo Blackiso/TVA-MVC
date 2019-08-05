@@ -47,6 +47,11 @@
 			return $return;
 		}
 
+		public function update($stm) {
+			$return = $this->query($stm);
+			return true;
+		}
+
 		public function insert($stm) {
 			$return = $this->query($stm);
 			$result = (object)array();

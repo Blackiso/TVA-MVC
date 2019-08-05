@@ -44,7 +44,7 @@
 
 			public static function update_company($data, $company_id) {
 				$update = self::update_query_constructor($data, self::$table, ['id' => $company_id]);
-				self::$database->insert($update);
+				self::$database->update($update);
 			}
 		}
 	}

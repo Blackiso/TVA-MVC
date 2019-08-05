@@ -36,7 +36,7 @@
 
 			public static function GET_company() {
 				$company_id = self::$params['company-id'];
-				if (!self::check_company($company_id)) View::bad_request();
+				self::check_company($company_id);
 				$response = CompaniesModel::get_company($company_id);
 				View::response($response);
 			}
@@ -44,7 +44,7 @@
 			public static function PATCH_company_upd() {
 				$company_id = self::$params['company-id'];
 				$data = self::$request->body;
-				if (!self::check_company($company_id)) View::bad_request();
+				if (!self::check_master_company($company_id)) View::bad_request();
 				if (!self::check_data($data, ['company_name', 'address', 'phone'], false)) View::bad_request();
 				CompaniesModel::update_company($data, $company_id);
 				View::response();
@@ -52,14 +52,14 @@
 
 			public static function DELETE_company_dlt() {
 				$company_id = self::$params['company-id'];
-				if (!self::check_company($company_id)) View::bad_request();
+				self::check_company($company_id);
 				CompaniesModel::delete_company($company_id);
 				View::response();
 			}
 
 			private static function check_company($company_id) {
-				$master_id = self::$user->master_id;
-				return CompaniesModel::check_company($company_id, $master_id);
+				$function = "check_".self::$user->user_type."_company";
+				if (!self::$function($company_id)) View::bad_request();
 			}
 		}
 	}

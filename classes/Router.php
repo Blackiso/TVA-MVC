@@ -3,11 +3,13 @@
 	class Router extends Routes {
 
 		private $uri;
+		private $method;
 		private $route;
 		
-		function __construct($uri) {
+		function __construct($uri, $method) {
 			$this->uri = rtrim($uri);
-			$this->route = $this->get_route($uri);
+			$this->method = $method;
+			$this->route = $this->get_route($uri, $method);
 		}
 
 		public function __get($name) {

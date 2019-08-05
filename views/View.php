@@ -6,7 +6,8 @@
 				'password' => 'Password Requires a Mix of Numbers and Letters Min Characters 5 and Max Characters 20',
 				'email_used' => 'Email already used!',
 				'account_blocked' => 'Your account is blocked!',
-				'authentication' => 'Authentication Error!'
+				'authentication' => 'Authentication Error!',
+				'company_set' => 'Company already set!'
 			];
 
 			public static function json($data) {

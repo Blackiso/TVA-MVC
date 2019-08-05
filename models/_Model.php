@@ -5,6 +5,7 @@
 
 			protected static $database;
 			protected static $page_limit = 20;
+			protected static $search_limit = 10;
 
 			public static function init() {
 				self::$database = \Database::get_instence();
@@ -26,6 +27,29 @@
 				if ($conditions !== null) {
 					$query = $query.self::conditions($conditions);
 				}
+				return $query;
+			}
+
+			protected static function search_query_constructor($culumns, $table, $search, $conditions = null) {
+				$query = "SELECT :culumns FROM :table";
+				$culumns = implode(',', $culumns);
+				$query = str_replace(':culumns', $culumns, $query);
+				$query = str_replace(':table', $table, $query);
+				if ($conditions !== null) {
+					$query .= self::conditions($conditions);
+					$query .= " AND";
+				}else {
+					$query .= " WHERE";
+				}
+				$search_arr = [];
+				foreach ($search as $key => $value) {
+					$s = explode(" ", urldecode($value));
+					$s = "%".implode("%", $s)."%";
+					$s = $key." LIKE '".$s."'";
+					array_push($search_arr, $s);
+				}
+				$query .= " ".implode(' AND ', $search_arr);
+				$query .= " LIMIT ".self::$search_limit;
 				return $query;
 			}
 
@@ -103,7 +127,7 @@
 				$check = "SELECT $id_name FROM $table WHERE $id_name IN ($ids)";
 				$result = self::$database->select($check);
 				if (!empty($result)) {
-					$this->generate_unique_ids($table, $id_name, $num);
+					self::generate_unique_ids($table, $id_name, $num);
 				}else {
 					return sizeof($return) > 1 ? $return : $return[0];
 				}
