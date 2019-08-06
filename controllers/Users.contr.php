@@ -36,6 +36,7 @@
 				$user_data->password = self::encrypt_password($user_data->password, $user_data->secret);
 
 				if (UsersModel::add_user($user_data)) {
+					$user_data->account_type = "user";
 					unset($user_data->password);
 					unset($user_data->secret);
 					unset($user_data->master_id);

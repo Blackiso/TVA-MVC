@@ -26,7 +26,7 @@
 			$this->master_id = $data->user_id;
 			$this->name = $data->name;
 			$this->email = $data->email;
-			$this->account_type = $data->account_type;
+			$this->account_type = $data->account_type ?? "user";
 			$this->user_type = $data->user_type;
 			$this->secret = $data->secret;
 			return true;
@@ -58,7 +58,7 @@
 				$this->name = $data->name;
 				$this->email = $data->email;
 				$this->password = $data->password;
-				$this->account_type = $data->account_type ?? null;
+				$this->account_type = $data->account_type ?? 'user';
 				$this->blocked = $data->blocked ?? null;
 				return true;
 			}else {

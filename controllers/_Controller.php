@@ -55,6 +55,15 @@
     			return count($array) != count(array_diff(array_map('serialize', $array), array_map('serialize', [' ', '', null, []])));
 			}
 
+			protected static function clear_empty($array) {
+				foreach ($array as $key => $value) {
+					if ($value == '' || $value == ' ' || $value == null || $value == []) {
+						unset($array[$key]);
+					}
+				}
+				return $array;
+			}
+
 			protected static function clear_str($str) {
 				return addslashes(strip_tags($str));
 			}

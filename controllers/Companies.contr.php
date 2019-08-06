@@ -30,7 +30,10 @@
 				}else {
 					$last_item_page = null;
 				}
-				$result = CompaniesModel::get_companies(self::$user->master_id, $last_item_page);
+				$id = self::$user->user_id;
+				$function = "get_".self::$user->user_type."_companies";
+				$result = self::$function($id, $last_item_page);
+				if (!empty($result) && !isset($result[0])) $result = [$result]; 
 				View::response($result);
 			}
 
@@ -60,6 +63,17 @@
 			private static function check_company($company_id) {
 				$function = "check_".self::$user->user_type."_company";
 				if (!self::$function($company_id)) View::bad_request();
+			}
+
+			private static function get_master_companies($master_id, $last_item) {
+				return CompaniesModel::get_master_companies($master_id, $last_item);
+			}
+
+			private static function get_user_companies($user_id, $last_item) {
+				$user_companies = \Models\Users::get_companies($user_id);
+				$companies = explode(',', $user_companies['companies']);
+				$companies = implode(',', self::clear_empty($companies));
+				return CompaniesModel::get_user_companies($companies, $last_item);
 			}
 		}
 	}

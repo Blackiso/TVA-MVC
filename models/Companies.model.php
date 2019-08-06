@@ -28,13 +28,25 @@
 				return self::$database->select($company_query);
 			}
 
-			public static function get_companies($master_id, $last_item) {
+			public static function get_master_companies($master_id, $last_item) {
 				$companies_query = self::pagination(
 					['id', 'company_name', 'activity', 'i_f'], 
 					self::$table, 
 					['master_id' => $master_id, 'deleted' => 0],
 					$last_item
 				);
+				return self::$database->select($companies_query);
+			}
+
+			public static function get_user_companies($ids, $last_item) {
+				$companies_query = self::pagination(
+					['id', 'company_name', 'activity', 'i_f'], 
+					self::$table, 
+					['x' => 'x', 'deleted' => 0],
+					$last_item
+				);
+				$qr_ids = "id IN ($ids)";
+				$companies_query = str_replace("x='x'", $qr_ids, $companies_query);
 				return self::$database->select($companies_query);
 			}
 

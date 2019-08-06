@@ -4,6 +4,7 @@
 		
 		private $params = [];
 		private $routes = [
+			//Authentication Routes
 			[
 				'uri' => '/api/authentication/login',
 				'controller' => 'Authentication',
@@ -36,6 +37,8 @@
 				'types' => [],
 				'method' => 'GET'
 			],
+			///////////////////////////////////////////////
+			// Users Routes
 			[
 				'uri' => '/api/users',
 				'controller' => 'Users',
@@ -76,6 +79,8 @@
 				'types' => ['premium'],
 				'method' => 'GET'
 			],
+			////////////////////////////////////////////
+			// Companies Routes
 			[
 				'uri' => '/api/companies',
 				'controller' => 'Companies',
@@ -116,6 +121,7 @@
 				'types' => ['premium', 'regular'],
 				'method' => 'PATCH'
 			]
+			/////////////////////////////////////////////
 		];
 
 		protected function get_route($uri, $method) {

@@ -51,13 +51,19 @@
 			}
 
 			public static function check_user_company($company_id, $user_id) {
-				$check_query = self::select_query_constructor(['user_id'], self::$user);
-				$check_query = $check_query.str_replace(':comp-id', $company_id, self::$custom_query);
+				$check_query = self::select_query_constructor(['user_id'], self::$user, ['user_id' => $user_id]);
+				$custom_query = str_replace('WHERE', 'AND', self::$custom_query);
+				$check_query = $check_query.str_replace(':comp-id', $company_id, $custom_query);
 				$result = self::$database->select($check_query);
 				if (!empty($result)) {
 					return true;
 				}
 				return false;
+			}
+
+			public static function get_companies($user_id) {
+				$get_query = self::select_query_constructor(['companies'], self::$user, ['user_id' => $user_id]);
+				return self::$database->select($get_query);
 			}
 
 			public static function search_user($master_id, $keyword) {
