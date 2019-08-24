@@ -86,11 +86,13 @@
 				return $query;
 			}
 
-			protected static function pagination($columns, $table, $conditions, $last_item) {
+			protected static function pagination($columns, $table, $conditions, $last_item, $sort = false) {
 				$select_query = self::select_query_constructor($columns, $table, $conditions);
 				if ($last_item !== null) {
-					$select_query.= " AND ".key($last_item)." > ".array_values($last_item)[0];
+					$sign = $sort !== false ? '<' : '>';
+					$select_query.= " AND ".key($last_item)." $sign ".array_values($last_item)[0];
 				}
+				if ($sort !== false) $select_query.= " ORDER BY ".$sort." DESC";
 				$select_query.= " LIMIT ".self::$page_limit;
 				return $select_query;
 			}
@@ -112,7 +114,8 @@
 			}
 
 			public static function soft_delete($table, $conditions) {
-				$qr = self::update_query_constructor(['deleted' => 1, 'deletion_time' => time()], $table, $conditions);
+				$time = date('Y-m-d h:i:s');
+				$qr = self::update_query_constructor(['deleted' => 1, 'deletion_time' => $time], $table, $conditions);
 				$result = self::$database->insert($qr);
 			}
 

@@ -7,6 +7,11 @@
 		private $db_host = "127.0.0.1";
 		private $db_name = "tva_app2";
 
+		// private $db_user = "b13_24305872";
+		// private $db_pass = "ismailismail123";
+		// private $db_host = "sql105.byethost13.com";
+		// private $db_name = "b13_24305872_api";
+
 		public static $instence;
 		private $conn;
 
@@ -19,12 +24,9 @@
 
 		private function __construct() {
 			try {
-				// init PDO object
 				$pdo_init = 'mysql:host='.$this->db_host;
-				$pdo_init .= ';dbname='.$this->db_name;
-			
+				$pdo_init .= ';dbname='.$this->db_name;		
 				$this->conn = new PDO($pdo_init, $this->db_user, $this->db_pass);
-				// Setup errors mod
 				$this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			} catch (PDOException $e) {
 			    $this->db_error($e->getMessage());

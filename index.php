@@ -1,8 +1,8 @@
 <?php
 	header('Content-Type: application/json');
 	header("Access-Control-Allow-Credentials: true");
-	header("Access-Control-Allow-Origin: http://localhost");
-	header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE");
+	header("Access-Control-Allow-Origin: http://localhost:4200");
+	header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS");
 	header("Access-Control-Allow-Headers: Authorization, *");
 
 	class Main {
@@ -61,7 +61,7 @@
 				rsort($arr_path);
 				foreach($arr_path as $arr) {
 					if (strpos($arr, '.php') !== false) {
-						$x = $path . '\\' .$arr;
+						$x = $path . '/' .$arr;
 						require_once($x);
 					}
 				}

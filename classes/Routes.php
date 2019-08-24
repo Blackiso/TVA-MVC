@@ -79,6 +79,14 @@
 				'types' => ['premium'],
 				'method' => 'GET'
 			],
+			[
+				'uri' => '/api/users/:user-id/update',
+				'controller' => 'Users',
+				'action' => 'update_user',
+				'auth' => true,
+				'types' => ['premium'],
+				'method' => 'PATCH'
+			],
 			////////////////////////////////////////////
 			// Companies Routes
 			[
@@ -94,7 +102,15 @@
 				'controller' => 'Companies',
 				'action' => 'all',
 				'auth' => true,
-				'types' => [],
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			[
+				'uri' => '/api/companies/search',
+				'controller' => 'Companies',
+				'action' => 'companies_search',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
 				'method' => 'GET'
 			],
 			[
@@ -102,7 +118,7 @@
 				'controller' => 'Companies',
 				'action' => 'company',
 				'auth' => true,
-				'types' => [],
+				'types' => ['regular', 'premium', 'user'],
 				'method' => 'GET'
 			],
 			[
@@ -120,6 +136,47 @@
 				'auth' => true,
 				'types' => ['premium', 'regular'],
 				'method' => 'PATCH'
+			],
+			/////////////////////////////////////////////
+			[
+				'uri' => '/api/files/:company-id',
+				'controller' => 'Files',
+				'action' => 'files',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'POST'
+			],
+			[
+				'uri' => '/api/files/:company-id',
+				'controller' => 'Files',
+				'action' => 'files',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			[
+				'uri' => '/api/files/:file-id',
+				'controller' => 'Files',
+				'action' => 'files',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'PATCH'
+			],
+			[
+				'uri' => '/api/files/:file-id',
+				'controller' => 'Files',
+				'action' => 'files',
+				'auth' => true,
+				'types' => ['regular', 'premium'],
+				'method' => 'DELETE'
+			],
+			[
+				'uri' => '/api/files/:company-id/search',
+				'controller' => 'Files',
+				'action' => 'search_files',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
 			]
 			/////////////////////////////////////////////
 		];

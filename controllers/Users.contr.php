@@ -3,13 +3,14 @@
 	namespace Controllers {
 
 		use Models\Users as UsersModel;
+		use Models\Companies as CompaniesModel;
 		use Views\View as View;
 
 		class Users extends Controller  {
 			
 			public static function POST_index() {
 				$user_data = self::$request->body;
-				if(!self::check_data($user_data, ['email', 'password', 'companies', 'name'])) {
+				if(!self::check_data($user_data, ['email', 'password', 'company', 'name'])) {
 					View::bad_request();
 				}
 
@@ -25,7 +26,7 @@
 					View::throw_error('password');
 				}
 
-				if (!self::check_master_company($user_data->companies)) {
+				if (!self::check_master_company($user_data->company)) {
 					View::bad_request();
 				}
 
@@ -34,8 +35,11 @@
 				$user_data->name = self::clear_str($user_data->name);
 				$user_data->secret = self::generate_secret($user_data->email);
 				$user_data->password = self::encrypt_password($user_data->password, $user_data->secret);
+				$company_id = $user_data->company;
+				unset($user_data->company);
 
 				if (UsersModel::add_user($user_data)) {
+					CompaniesModel::add_user_company($company_id, $user_data->user_id);
 					$user_data->account_type = "user";
 					unset($user_data->password);
 					unset($user_data->secret);
@@ -50,7 +54,7 @@
 				if (!self::check_master_company($company_id)) View::bad_request();
 				if (self::check_user_company($company_id, $user_id)) View::throw_error('company_set');
 				self::check_user($user_id);
-				UsersModel::add_users_to_company($company_id, $user_id);
+				CompaniesModel::add_user_company($company_id, $user_id);
 				View::response();
 			}
 
@@ -68,7 +72,7 @@
 				$company_id = self::$request->body->companies;
 				if (!self::check_master_company($company_id)) View::bad_request();
 				if (!self::check_user_company($company_id, $user_id)) View::bad_request();
-				UsersModel::delete_company_from_user($company_id, $user_id);
+				CompaniesModel::delete_company_from_user($company_id, $user_id);
 				View::response();
 			}
 
@@ -78,6 +82,30 @@
 				$result = UsersModel::search_user($master_id, $keyword);
 				if (!empty($result) && !isset($result[0])) $result = [$result];
 				View::response($result);
+			}
+
+			public static function PATCH_update_user() {
+				$user_id = self::$params['user-id'];
+				$user_data = self::$request->body;
+				self::check_user($user_id);
+				if(!self::check_data($user_data, ['email', 'password', 'name'], false)) View::bad_request();
+				if (isset($user_data->email)) {
+					if (!self::filter_email($user_data->email)) {
+						View::bad_request();
+					}
+					if (UsersModel::check_email_exist($user_data->email)) {
+						View::throw_error('email_used');
+					}
+				}
+				if (isset($user_data->password)) {
+					if (!self::filter_password($user_data->password)) {
+						View::throw_error('password');
+					}
+					$user_secret = UsersModel::get_secret($user_id)['secret'];
+					$user_data->password = self::encrypt_password($user_data->password, $user_secret);
+				}
+				UsersModel::update_user($user_id, $user_data);
+				View::response();
 			}
 
 			private static function filter_email($email) {
