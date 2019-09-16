@@ -15,7 +15,7 @@
 			}
 
 			public static function get_secret($id) {
-				$get_query = self::select_query_constructor(['secret'], self::$user, ['user_id' => $user_id]);
+				$get_query = self::select_query_constructor(['secret'], self::$user, ['user_id' => $id]);
 				return self::$database->select($get_query);
 			}
 
@@ -48,7 +48,7 @@
 			}
 
 			public static function search_user($master_id, $keyword) {
-				$search_query = self::search_query_constructor(['email', 'user_id', 'name'], self::$user, ['name' => $keyword], ['master_id' => $master_id]);
+				$search_query = self::search_query_constructor(['email', 'user_id', 'name', 'blocked'], self::$user, ['name' => $keyword], ['master_id' => $master_id]);
 				return self::$database->select($search_query);
 			}
 
@@ -57,8 +57,19 @@
 				self::$database->update($update);
 			}
 
+			public static function block_user($user_id, $val) {
+				$update = self::update_query_constructor(['blocked' => $val], self::$user, ['user_id' => $user_id]);
+				self::$database->update($update);
+			}
+
 			public static function check_user($user_id, $master_id) {
 				return self::check_row(self::$user, ['user_id' => $user_id, 'master_id' => $master_id]);
+			}
+
+			public static function count_users($company_id) {
+				$query = self::select_query_constructor(['user_id'], self::$companies_table, ['id' => $company_id]);
+				$result = self::$database->select($query);
+				return !isset($result[0]) ? 1 : sizeof($result);
 			}
 		}
 	}

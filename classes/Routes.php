@@ -72,6 +72,22 @@
 				'method' => 'DELETE'
 			],
 			[
+				'uri' => '/api/users/:user-id/block',
+				'controller' => 'Users',
+				'action' => 'block_user',
+				'auth' => true,
+				'types' => ['premium'],
+				'method' => 'POST'
+			],
+			[
+				'uri' => '/api/users/:user-id/unblock',
+				'controller' => 'Users',
+				'action' => 'unblock_user',
+				'auth' => true,
+				'types' => ['premium'],
+				'method' => 'POST'
+			],
+			[
 				'uri' => '/api/users/search',
 				'controller' => 'Users',
 				'action' => 'search_users',
@@ -163,7 +179,15 @@
 				'method' => 'PATCH'
 			],
 			[
-				'uri' => '/api/files/:file-id',
+				'uri' => '/api/files/:file-id/details',
+				'controller' => 'Files',
+				'action' => 'details',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			[
+				'uri' => '/api/files/delete',
 				'controller' => 'Files',
 				'action' => 'files',
 				'auth' => true,
@@ -177,6 +201,81 @@
 				'auth' => true,
 				'types' => ['regular', 'premium', 'user'],
 				'method' => 'GET'
+			],
+			/////////////////////////////////////////////
+			[
+				'uri' => '/api/bills/:file-id',
+				'controller' => 'Bills',
+				'action' => null,
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'POST'
+			],
+			[
+				'uri' => '/api/bills/:file-id/:month',
+				'controller' => 'Bills',
+				'action' => null,
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			[
+				'uri' => '/api/bills/suppliers',
+				'controller' => 'Bills',
+				'action' => 'suppliers',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			[
+				'uri' => '/api/bills/:bill-id',
+				'controller' => 'Bills',
+				'action' => null,
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'PATCH'
+			],
+			[
+				'uri' => '/api/bills/delete',
+				'controller' => 'Bills',
+				'action' => null,
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'DELETE'
+			],
+			[
+				'uri' => '/api/bills/:file-id/:month/search',
+				'controller' => 'Bills',
+				'action' => 'search',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			/////////////////////////////////////////////
+			[
+				'uri' => '/api/download/:file-id/:month/xml',
+				'controller' => 'Download',
+				'action' => 'xml',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			[
+				'uri' => '/api/download/:file-id/:month/pdf',
+				'controller' => 'Download',
+				'action' => 'pdf',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			/////////////////////////////////////////////
+			[
+				'uri' => '/api/payment/create',
+				'controller' => 'Payment',
+				'action' => 'create',
+				'auth' => true,
+				'types' => ['regular', 'pending'],
+				'method' => 'POST'
 			]
 			/////////////////////////////////////////////
 		];

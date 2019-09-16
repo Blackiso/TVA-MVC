@@ -32,6 +32,12 @@
 				return $result['secret'] ?? null;
 			}
 
+			public static function user_block($id) {
+				$secret_query = self::select_query_constructor(['blocked'], self::$user, ['user_id' => $id]);
+				$result = self::$database->select($secret_query);
+				return $result['blocked'] ?? null;
+			}
+
 			public static function get_user_from_email($email, $type) {
 				$columns = ['user_id', 'name', 'email', 'password', 'secret'];
 

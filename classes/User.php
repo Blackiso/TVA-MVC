@@ -66,6 +66,17 @@
 			}
 		}
 
+		public function check_block() {
+			if ($this->user_type == 'user') {
+				if (isset($this->blocked) && $this->blocked) {
+					return true;
+				}else {
+					return $this->get_block();
+				}
+			}
+			return false;
+		}
+
 		public function generate_jwt($revoke = true) {
 			if ($revoke) $this->revoke_secret();
 			$payload = (object) array();
@@ -122,6 +133,10 @@
 
 		public function update_user($updates) {
 			return Auth_model::update_user($updates, $this->user_type, $this->user_id);
+		}
+
+		public function get_block() {
+			return Auth_model::user_block($this->user_id);
 		}
 
 		private function get_secret() {

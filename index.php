@@ -1,4 +1,6 @@
 <?php
+	ini_set('precision', 10);
+	ini_set('serialize_precision', 10);
 	header('Content-Type: application/json');
 	header("Access-Control-Allow-Credentials: true");
 	header("Access-Control-Allow-Origin: http://localhost:4200");

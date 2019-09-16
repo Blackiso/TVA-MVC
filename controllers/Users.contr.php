@@ -30,6 +30,10 @@
 					View::bad_request();
 				}
 
+				if (UsersModel::count_users($user_data->company) >= 20) {
+					View::bad_request();
+				}
+
 				$user_data->user_id = UsersModel::generate_id();
 				$user_data->master_id = self::$user->user_id;
 				$user_data->name = self::clear_str($user_data->name);
@@ -44,6 +48,7 @@
 					unset($user_data->password);
 					unset($user_data->secret);
 					unset($user_data->master_id);
+					$user_data->blocked = 0;
 					View::created($user_data);
 				}
 			}
@@ -76,6 +81,21 @@
 				View::response();
 			}
 
+			public static function POST_block_user() {
+				$user_id = self::$params['user-id'];
+				self::check_user($user_id);
+				UsersModel::block_user($user_id, 1);
+				View::response();
+			}
+
+
+			public static function POST_unblock_user() {
+				$user_id = self::$params['user-id'];
+				self::check_user($user_id);
+				UsersModel::block_user($user_id, 0);
+				View::response();
+			}
+
 			public static function GET_search_users() {
 				$keyword = self::$request->querys['keyword'] ?? View::bad_request();
 				$master_id = self::$user->master_id;
@@ -102,6 +122,7 @@
 						View::throw_error('password');
 					}
 					$user_secret = UsersModel::get_secret($user_id)['secret'];
+					$user_secret = explode('-', $user_secret)[0];
 					$user_data->password = self::encrypt_password($user_data->password, $user_secret);
 				}
 				UsersModel::update_user($user_id, $user_data);

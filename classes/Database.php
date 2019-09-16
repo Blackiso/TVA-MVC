@@ -89,7 +89,7 @@
 		}
 
 		private function db_error($msg) {
-			echo json_encode(array('DB Error' => $msg));
+			echo json_encode(array('error' => $msg));
 			exit();
 		}
 	}

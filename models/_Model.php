@@ -5,7 +5,7 @@
 
 			protected static $database;
 			protected static $page_limit = 20;
-			protected static $search_limit = 10;
+			protected static $search_limit = 15;
 
 			public static function init() {
 				self::$database = \Database::get_instence();
@@ -31,7 +31,7 @@
 			}
 
 			protected static function search_query_constructor($culumns, $table, $search, $conditions = null) {
-				$query = "SELECT :culumns FROM :table";
+				$query = "SELECT DISTINCT :culumns FROM :table";
 				$culumns = implode(',', $culumns);
 				$query = str_replace(':culumns', $culumns, $query);
 				$query = str_replace(':table', $table, $query);
@@ -60,6 +60,30 @@
 				foreach ($culumns as $culumn => $value) {
 					array_push($_culumns, $culumn);
 					array_push($_values, "'".$value."'");
+				}
+
+				$query = str_replace(':table', $table, $query);
+				$query = str_replace(':culumns', implode(',', $_culumns), $query);
+				$query = str_replace(':values', implode(',', $_values), $query);
+
+				return $query;
+			}
+
+			protected static function multiple_insert_query_constructor($culumns, $values, $table) {
+				$query = "INSERT INTO :table (:culumns) VALUES :values";
+				$_culumns = [];
+				$_values = [];
+				foreach ($culumns as $culumn) {
+					array_push($_culumns, $culumn);
+				}
+
+				foreach ($values as $k => $v) {
+					$x = [];
+					foreach ($v as $key => $value) {
+						array_push($x, "'".$value."'");
+					}
+					$x = implode(',', $x);
+					array_push($_values, "($x)");
 				}
 
 				$query = str_replace(':table', $table, $query);
@@ -101,7 +125,11 @@
 				$cond = " WHERE ";
 				$arr = [];
 				foreach ($conditions as $key => $value) {
-					$x = $key."='".$value."'";
+					if (gettype($key) == "integer") {
+						$x = $value;
+					}else {
+						$x = $key."='".$value."'";
+					}
 					array_push($arr, $x);
 				}
 				return $cond.implode(' AND ', $arr);
@@ -122,9 +150,9 @@
 			public static function generate_unique_ids($table, $id_name, $num = 1) {
 				$return = array();
 				for ($i = 0; $i < $num; $i++) { 
-					$id  = explode('.', microtime(true))[0];
+					$id  = time();
+					if ($num > 1 && $i > 0) $id = $id + $i;
 					array_push($return, $id);
-					usleep(3 * 100);
 				}
 				$ids = implode(", ", $return);
 				$check = "SELECT $id_name FROM $table WHERE $id_name IN ($ids)";

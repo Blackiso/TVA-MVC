@@ -22,6 +22,7 @@
 				if($this->user->check_renew($this->jwt)) {
 					$this->user->new_jwt();
 				}
+				if($this->user->check_block()) throw new Exception();
 				$this->is_auth = true;
 			} catch (Exception $e) {
 				$this->is_auth = false;

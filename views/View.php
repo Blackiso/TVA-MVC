@@ -77,5 +77,9 @@
 					http_response_code(204);
 				}
 			}
+
+			public static function plain_response($data) {
+				echo $data;
+			}
 		}
 	}
