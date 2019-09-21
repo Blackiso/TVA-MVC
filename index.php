@@ -3,7 +3,7 @@
 	ini_set('serialize_precision', 10);
 	header('Content-Type: application/json');
 	header("Access-Control-Allow-Credentials: true");
-	header("Access-Control-Allow-Origin: http://localhost:4200");
+	header("Access-Control-Allow-Origin: http://localhost");
 	header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS");
 	header("Access-Control-Allow-Headers: Authorization, *");
 

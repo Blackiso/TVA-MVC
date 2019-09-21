@@ -154,6 +154,7 @@
 				'method' => 'PATCH'
 			],
 			/////////////////////////////////////////////
+			// Files Routes
 			[
 				'uri' => '/api/files/:company-id',
 				'controller' => 'Files',
@@ -203,6 +204,7 @@
 				'method' => 'GET'
 			],
 			/////////////////////////////////////////////
+			// Bills Routes
 			[
 				'uri' => '/api/bills/:file-id',
 				'controller' => 'Bills',
@@ -252,6 +254,7 @@
 				'method' => 'GET'
 			],
 			/////////////////////////////////////////////
+			// Download Routes
 			[
 				'uri' => '/api/download/:file-id/:month/xml',
 				'controller' => 'Download',
@@ -269,13 +272,48 @@
 				'method' => 'GET'
 			],
 			/////////////////////////////////////////////
+			// Payment Routes
 			[
 				'uri' => '/api/payment/create',
 				'controller' => 'Payment',
 				'action' => 'create',
 				'auth' => true,
-				'types' => ['regular', 'pending'],
+				'types' => ['premium', 'pending'],
 				'method' => 'POST'
+			],
+			[
+				'uri' => '/api/payment/capture',
+				'controller' => 'Payment',
+				'action' => 'capture',
+				'auth' => true,
+				'types' => ['premium', 'pending'],
+				'method' => 'GET'
+			],
+			[
+				'uri' => '/api/payment/history',
+				'controller' => 'Payment',
+				'action' => 'history',
+				'auth' => true,
+				'types' => ['premium'],
+				'method' => 'GET'
+			],
+			/////////////////////////////////////////////
+			// Account Routes
+			[
+				'uri' => '/api/account/update',
+				'controller' => 'Account',
+				'action' => null,
+				'auth' => true,
+				'types' => ['premium'],
+				'method' => 'PATCH'
+			],
+			[
+				'uri' => '/api/account/details',
+				'controller' => 'Account',
+				'action' => null,
+				'auth' => true,
+				'types' => ['premium'],
+				'method' => 'GET'
 			]
 			/////////////////////////////////////////////
 		];

@@ -26,10 +26,10 @@
 				return $result;
 			}
 
-			public static function get_secret($id, $type) {
-				$secret_query = self::select_query_constructor(['secret'], self::$$type, ['user_id' => $id]);
+			public static function get_info($id, $type, $info) {
+				$secret_query = self::select_query_constructor($info, self::$$type, ['user_id' => $id]);
 				$result = self::$database->select($secret_query);
-				return $result['secret'] ?? null;
+				return $result ?? null;
 			}
 
 			public static function user_block($id) {

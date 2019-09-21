@@ -18,6 +18,7 @@
 					$secret = $user->secret;
 					$user_data->password = self::encrypt_password($user_data->password, $secret);
 					if ($user_data->password == $user->password) {
+						$user->check_expire();
 						if ($user->blocked == true) View::throw_error('account_blocked');
 						$user->new_jwt();
 						$info = $user->info;
@@ -34,7 +35,7 @@
 				$user = new \User();
 				$user_ip = self::$request->ip;
 				$user_agent = self::$request->agent;
-				$account_type = "premium";
+				$account_type = "pending";
 				$user_data = self::$request->body;
 
 				if (!self::check_data($user_data, ['name','email', 'password'])) {

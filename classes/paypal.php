@@ -9,8 +9,9 @@
 		private $live_link = "https://api.paypal.com";
 		private $sandbox_link = "https://api.sandbox.paypal.com";
 		public  $cancel_url = "http://tva-app.test/cancel";
-		public  $return_url = "http://localhost/server_test/paypal_approve.php";
+		public  $return_url = "http://localhost:4200/capture-payment";
 		public  $approve_url = "https://www.sandbox.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";
+		public  $approve_url_ = "https://www.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";
 		private $link;
 		private $mode = "sandbox";
 		private $client_id = "AbxeS8PkMc-yNjzVL7-0Xlv4p0oHbmL3ZQ05VuXFKXtLA8vjYyRufqhEjvwr5zcu7BaLyP5eNz8cK5Nh";
@@ -24,7 +25,7 @@
 		}
 
 		public function get_token() {
-			$filename = "../main-files/paypal-token.dat";
+			$filename = "paypal-token.dat";
 			$file = fopen($filename, "r+");
 			$file_data = fread($file, filesize($filename));
 			$file_data = json_decode($file_data);
@@ -38,7 +39,7 @@
 			));
 			$this->set_body("grant_type=client_credentials");
 			$this->set_un_ps($this->client_id, $this->client_secret);
-			$data = json_decode($this->request("POST", $this->link."/v1/oauth2/token"));
+			$data = $this->request("POST", $this->link."/v1/oauth2/token");
 			$this->api_token = $data->access_token;
 			$exp = time() + 60*60*8;
 			$file_write = [
@@ -53,6 +54,7 @@
 		}
 
 		public function create_order($config) {
+			$config = json_encode($config);
 			$this->set_headers(array(
 				"authorization: Bearer $this->api_token",
 				"content-type: application/json"

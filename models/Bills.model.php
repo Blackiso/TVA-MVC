@@ -45,8 +45,9 @@
 					self::$table, 
 					['file_id' => $file_id, 'month' => $month]
 				);
-				if (!empty($bills_query) && !isset($bills_query[0])) $bills_query = [$bills_query];
-				return self::$database->select($bills_query);
+				$result = self::$database->select($bills_query);
+				if (!empty($result) && !isset($result[0])) $result = [$result];
+				return $result;
 			}
 
 			public static function check_bill($bill_id, $user_id, $type) {

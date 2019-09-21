@@ -1,6 +1,7 @@
 <?php
 	
-	use Models\Authentication as Auth_model;
+	use Models\Authentication as AuthModel;
+	use Models\Payment as PaymentModel;
 
 	require_once('JWT.php');
 	
@@ -18,7 +19,7 @@
 		private $blocked;
 
 		function __construct() {
-			Auth_model::init();
+			AuthModel::init();
 		}
 
 		public function init_data($data) {
@@ -66,6 +67,36 @@
 			}
 		}
 
+		public function check_expire() {
+			if ($this->user_type == 'user') {
+				$account_type = PaymentModel::get_account_type($this->master_id);
+				if ($account_type == 'pending') return true;
+			}
+
+			if ($this->account_type == "pending") return false;
+
+			$expire_date = PaymentModel::get_expire_date($this->master_id);
+			if (!$expire_date) {
+				$this->reset_account();
+				return true;
+			}
+
+			$expire_date = strtotime($expire_date);
+			$now = time();
+			if ($expire_date < $now) {
+				$this->reset_account();
+				return true;
+			}
+
+			return false;
+		}
+
+		public function reset_account() {
+			PaymentModel::set_account_type('pending', $this->master_id);
+			$this->account_type = "pending";
+			$this->revoke_secret();
+		}
+
 		public function check_block() {
 			if ($this->user_type == 'user') {
 				if (isset($this->blocked) && $this->blocked) {
@@ -78,7 +109,10 @@
 		}
 
 		public function generate_jwt($revoke = true) {
-			if ($revoke) $this->revoke_secret();
+			if ($revoke) {
+				$this->revoke_secret();
+				$this->get_new_info();
+			}
 			$payload = (object) array();
 			$payload->uid = $this->user_id;
 			$payload->mid = $this->master_id;
@@ -105,6 +139,14 @@
 			return true;
 		}
 
+		private function get_new_info() {
+			$data = AuthModel::get_info($this->user_id, $this->user_type, ['email', 'name', 'account_type', 'secret']);
+			$this->name = $data['name'];
+			$this->email = $data['email'];
+			$this->secret = $data['secret'];
+			$this->account_type = $data['account_type'];
+		}
+
 		public function __get($name) {
 			$method = 'get_'.$name;
 			if (method_exists($this, $method)) {
@@ -128,22 +170,29 @@
 		}
 
 		public function get_user_from_email() {
-			return Auth_model::get_user_from_email($this->email, $this->user_type);
+			return AuthModel::get_user_from_email($this->email, $this->user_type);
 		}
 
 		public function update_user($updates) {
-			return Auth_model::update_user($updates, $this->user_type, $this->user_id);
+			return AuthModel::update_user($updates, $this->user_type, $this->user_id);
 		}
 
 		public function get_block() {
-			return Auth_model::user_block($this->user_id);
+			return AuthModel::user_block($this->user_id);
 		}
 
 		private function get_secret() {
 			if ($this->secret == null) {
-				return $this->secret = Auth_model::get_secret($this->user_id, $this->user_type);
+				return $this->secret = AuthModel::get_info($this->user_id, $this->user_type, ['secret'])['secret'];
 			}
 			return $this->secret;
+		}
+
+		private function get_password() {
+			if ($this->password == null) {
+				return $this->password = AuthModel::get_info($this->user_id, $this->user_type, ['password'])['password'];
+			}
+			return $this->password;
 		}
 
 		private function get_info() {

@@ -7,7 +7,9 @@
 				'email_used' => 'Email already used!',
 				'account_blocked' => 'Your account is blocked!',
 				'authentication' => 'Authentication Error!',
-				'company_set' => 'Company already set!'
+				'company_set' => 'Company already set!',
+				'payment_already_captured' => 'Error payment already captured!',
+				'payment_error' => 'Payment Error!'
 			];
 
 			public static function json($data) {

@@ -15,14 +15,15 @@
 
 		private function authenticate() {
 			try {
-				if(!$this->user->init_jwt($this->jwt)) throw new Exception();
+				if (!$this->user->init_jwt($this->jwt)) throw new Exception();
 				$secret = $this->user->__get('secret');
-				if(!$this->user->verify_JWT($this->jwt, $secret)) throw new Exception();
-				if($this->user->exp_check_JWT($this->jwt)) throw new Exception();
-				if($this->user->check_renew($this->jwt)) {
-					$this->user->new_jwt();
-				}
-				if($this->user->check_block()) throw new Exception();
+				
+				if (!$this->user->verify_JWT($this->jwt, $secret)) throw new Exception();
+				if ($this->user->exp_check_JWT($this->jwt)) throw new Exception();
+				if ($this->user->check_renew($this->jwt)) $this->user->new_jwt();
+				if ($this->user->check_expire()) throw new Exception();
+				if ($this->user->check_block()) throw new Exception();
+
 				$this->is_auth = true;
 			} catch (Exception $e) {
 				$this->is_auth = false;

@@ -42,7 +42,7 @@
 			curl_setopt($this->curl, CURLOPT_TIMEOUT, 30);
 			curl_setopt($this->curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 			// curl_setopt($this->curl, CURLINFO_HEADER_OUT, true);
-			return $response = curl_exec($this->curl);
+			return json_decode($response = curl_exec($this->curl));
 		}
 
 	}
