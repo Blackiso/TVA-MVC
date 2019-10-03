@@ -9,9 +9,14 @@
 		private $live_link = "https://api.paypal.com";
 		private $sandbox_link = "https://api.sandbox.paypal.com";
 		public  $cancel_url = "http://tva-app.test/cancel";
+
 		public  $return_url = "http://localhost:4200/capture-payment";
+		public  $return_url__ = "http://tva-angular.byethost13.com/capture-payment";
+		public  $return_url_ = "http://15.188.120.45/capture-payment";
+
 		public  $approve_url = "https://www.sandbox.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";
 		public  $approve_url_ = "https://www.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";
+
 		private $link;
 		private $mode = "sandbox";
 		private $client_id = "AbxeS8PkMc-yNjzVL7-0Xlv4p0oHbmL3ZQ05VuXFKXtLA8vjYyRufqhEjvwr5zcu7BaLyP5eNz8cK5Nh";
@@ -25,6 +30,7 @@
 		}
 
 		public function get_token() {
+			$filename_ = "/opt/bitnami/apache2/htdocs/backend/paypal-token.dat";
 			$filename = "paypal-token.dat";
 			$file = fopen($filename, "r+");
 			$file_data = fread($file, filesize($filename));
@@ -79,8 +85,9 @@
 			return $this->request("GET", $this->link."/v2/checkout/orders/$order_id");
 		}
 
-		public function refund($capture_id, $body = array()) {
+		public function refund($capture_id, $body = []) {
 			$body = (object) $body;
+			$body = json_decode($body);
 			$this->set_headers(array(
 				"authorization: Bearer $this->api_token",
 				"content-type: application/json"

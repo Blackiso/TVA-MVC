@@ -33,7 +33,7 @@
 
 			public static function get_company($company_id) {
 				$company_query = self::select_query_constructor(
-					['id', 'company_name', 'activity', 'i_f', 'phone', 'address'], 
+					['id', 'company_name', 'activity', 'i_f', 'phone', 'address', 'email'], 
 					self::$table, 
 					['id' => $company_id, 'deleted' => 0]
 				);
@@ -52,7 +52,7 @@
 			}
 
 			public static function search_company($keyword, $user_id) {
-				$search_query = self::search_query_constructor(['id', 'company_name', 'activity', 'i_f'], self::$table, ['company_name' => $keyword], ['master_id' => $user_id]);
+				$search_query = self::search_query_constructor(['id', 'company_name', 'activity', 'i_f'], self::$table, ['company_name' => $keyword], ['master_id' => $user_id, 'deleted' => 0]);
 				return self::$database->select($search_query);
 			}
 

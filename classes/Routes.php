@@ -153,6 +153,14 @@
 				'types' => ['premium', 'regular'],
 				'method' => 'PATCH'
 			],
+			[
+				'uri' => '/api/companies/:company-id/stats',
+				'controller' => 'Companies',
+				'action' => 'stats',
+				'auth' => true,
+				'types' => ['premium', 'regular'],
+				'method' => 'GET'
+			],
 			/////////////////////////////////////////////
 			// Files Routes
 			[
@@ -253,6 +261,14 @@
 				'types' => ['regular', 'premium', 'user'],
 				'method' => 'GET'
 			],
+			[
+				'uri' => '/api/bills/:file-id/:month/table',
+				'controller' => 'Bills',
+				'action' => 'table',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
 			/////////////////////////////////////////////
 			// Download Routes
 			[
@@ -293,6 +309,14 @@
 				'uri' => '/api/payment/history',
 				'controller' => 'Payment',
 				'action' => 'history',
+				'auth' => true,
+				'types' => ['premium'],
+				'method' => 'GET'
+			],
+			[
+				'uri' => '/api/payment/:payment-id/refund',
+				'controller' => 'Payment',
+				'action' => 'refund',
 				'auth' => true,
 				'types' => ['premium'],
 				'method' => 'GET'

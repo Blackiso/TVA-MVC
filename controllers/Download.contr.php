@@ -26,32 +26,34 @@
 						"rd" => []
 					]
 				];
+				$order = (int) BillsModel::get_order_start($month, $file_id);
 
 				foreach ($bills as $i => $bill) {
 					$arr = [];
-					$arr['ord'] = $i+1;
+					$arr['ord'] = $order+1;
 					$arr['num'] = $bill['nfa'];
 					$arr['des'] = $bill['dbs'];
-					$arr['mht'] = $bill['mht'];
-					$arr['tva'] = $bill['tva'];
-					$arr['ttc'] = $bill['ttc'];
+					$arr['mht'] = number_format($bill['mht'], 2, '.', '');
+					$arr['tva'] = number_format($bill['tva'], 2, '.', '');
+					$arr['ttc'] = number_format($bill['ttc'], 2, '.', '');
 					$arr['refF'] = [
 						"if" => $bill['iff'],
 						"nom" => $bill['ndf'],
 						"ice" => $bill['ice']
 					];
-					$arr['tx'] = $bill['tau'];
+					$arr['tx'] = number_format($bill['tau'], 2, '.', '');
 					$arr['mp'] = [
 						"id" => $bill['mdp']
 					];
 					$arr['dpai'] = $bill['ddp'];
 					$arr['dfac'] = $bill['ddf'];
 					array_push($main['releveDeductions']['rd'], $arr);
+					$order++;
 				}
 
 				$xml = new \LaLit\Array2XML();
 				$xx = $xml::createXML("DeclarationReleveDeduction", $main);
-				$xx = str_replace('<?xml version="1.0" encoding="utf-8" standalone="no"?>', '', $xx->saveXML());
+				$xx = str_replace('standalone="no"', '', $xx->saveXML());
 				header('Content-Type: application/xml');
 				// header('Content-Disposition: attachment; filename="'.$file_name_full.'"');
 				View::plain_response($xx);
@@ -64,6 +66,7 @@
 
 				$file = self::check_file_and_month($file_id, $month);
 				$bills = BillsModel::get_all_bills($file_id, $month);
+				$order = (int) BillsModel::get_order_start($month, $file_id);
 
 				$data = [
 					"year" => $file['year'],
@@ -74,7 +77,7 @@
 				];
 
 				$pdf = new \PDF($data);
-				$pdf->init($bills);
+				$pdf->init($bills, $order);
 			}
 
 			private static function check_file_and_month($file_id, $month) {

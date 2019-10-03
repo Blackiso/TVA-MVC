@@ -10,9 +10,20 @@
 		protected $page_type = 'L';
 		protected $data;
 
+		private $pages_total = 0;
 		private $mht_val = 0;
 		private $tva_val = 0;
 		private $ttc_val = 0;
+
+		private $payment_mode = [
+			1 => "ESPÈCE",
+			2 => "CHEQUE",
+			3 => "PRÉLÈVEMENT",
+			4 => "VIREMENT",
+			5 => "EFFET",
+			6 => "COMPENSATION",
+			7 => "AUTRES"
+		];
 
 		function __construct($data) {
 			$this->data = (object) $data;
@@ -25,45 +36,90 @@
 			$this->AddPage();
 		}
 
-		public function init($bills) {
+		public function init($bills, $order) {
 
-			$payment_mode = [
-				1 => "espèce",
-				2 => "cheque",
-				3 => "prélèvement",
-				4 => "virement",
-				5 => "effet",
-				6 => "compensation",
-				7 => "autres"
-			];
+			$arrays = [];
+			$current_index = 0;
+			$full_bills = [];
 
-			foreach ($bills as $i => $bill) {
-				$bill = (object) $bill;
-				$this->setX(8);
-				$this->SetFont('Arial', '', 8);
-				$this->Cell(16.2, 5.3, $i+1, 1, 0);
-				$this->Cell(15.1, 5.3, $bill->nfa, 1, 0);
-				$this->Cell(19.6, 5.3, $bill->ddf, 1, 0, 'C');
-				$nome = urldecode($this->em($bill->ndf));
-				$this->Cell(35.2, 5.3, $nome, 1, 0, 'C');
-				$this->Cell(32.57, 5.3, $bill->iff, 1, 0, 'C');
-				$this->Cell(27.54, 5.3, $bill->ice, 1, 0, 'C');
-				$dbs = urldecode($this->em($bill->dbs));
-				$this->Cell(27.25, 5.3, $dbs, 1, 0, 'C');
-				$this->Cell(19.6, 5.3, $bill->mht, 1, 0, 'C');
-				$this->Cell(12.43, 5.3, $bill->tau, 1, 0, 'C');
-				$this->Cell(18.8, 5.3, $bill->tva, 1, 0, 'C');
-				$this->Cell(18.53, 5.3, $bill->ttc, 1, 0, 'C');
-				$mode = urldecode($this->em($payment_mode[$bill->mdp]));
-				$this->Cell(18.8, 5.3, $mode, 1, 0, 'C');
-				$this->Cell(18.5, 5.3, $bill->ddp, 1, 1, 'C');
+			foreach ($bills as $key => $value) {
+				if ($key == 0) {
+					$arrays[$current_index] = [];
+				}else if ($bills[$key - 1]['tau'] !== $bills[$key]['tau']) {
+					$current_index++;
+					$arrays[$current_index] = [];
+				}
+				array_push($arrays[$current_index], $value);
+			}
 
-				$this->mht_val = $this->mht_val + (int) $bill->mht;
-				$this->tva_val = $this->tva_val + (int) $bill->tva;
-				$this->ttc_val = $this->ttc_val + (int) $bill->ttc;
+			foreach ($arrays as $key => $value) {
+				$pages = ceil(sizeof($value) / 17);
+				$loop = (17 * $pages) - sizeof($value);
+				for ($i = 0; $i < $loop; $i++) { 
+					array_push($arrays[$key], " ");
+				}
+				$full_bills = array_merge($full_bills, $arrays[$key]);
+			}
+
+			for ($i = 0; $i < sizeof($full_bills); $i++) { 
+				if ($full_bills[$i] !== " ") {
+					$bill = (object) $full_bills[$i];
+					$this->setX(8);
+					$this->SetFont('Arial', '', 8);
+					$this->Cell(16.2, 5.3, $order+1, 1, 0);
+					$this->Cell(15.1, 5.3, $this->resize($bill->nfa, 7), 1, 0);
+					$this->Cell(19.6, 5.3, $bill->ddf, 1, 0, 'C');
+					$nome = urldecode($this->em($bill->ndf));
+					$this->Cell(35.2, 5.3, $this->resize($nome, 23), 1, 0);
+					$this->Cell(32.57, 5.3, $bill->iff, 1, 0);
+					$this->Cell(27.54, 5.3, $bill->ice, 1, 0);
+					$dbs = urldecode($this->em($bill->dbs));
+					$this->Cell(27.25, 5.3, $this->resize($dbs, 13), 1, 0);
+					$this->Cell(19.6, 5.3, number_format($bill->mht, 2, '.', ' '), 1, 0, 'R');
+					$this->Cell(12.43, 5.3, number_format($bill->tau, 2, '.', ' '), 1, 0, 'R');
+					$this->Cell(18.8, 5.3, number_format($bill->tva, 2, '.', ' '), 1, 0, 'R');
+					$this->Cell(18.53, 5.3, number_format($bill->ttc, 2, '.', ' '), 1, 0, 'R');
+					$mode = urldecode($this->em($this->payment_mode[$bill->mdp]));
+					$this->Cell(18.8, 5.3, $this->resize($mode, 8), 1, 0);
+					$this->Cell(18.5, 5.3, $bill->ddp, 1, 1, 'C');
+
+					$this->mht_val = $this->mht_val + (float) $bill->mht;
+					$this->tva_val = $this->tva_val + (float) $bill->tva;
+					$this->ttc_val = $this->ttc_val + (float) $bill->ttc;
+					$this->pages_total = $this->pages_total + (float) $bill->tva;
+					$order++;
+				}else {
+					$this->empty_row();
+				}
 			}
 
 			$this->Output();
+		}
+
+		private function resize($str, $max) {
+			if (strlen($str) > $max) {
+				$sub = strlen($str) - $max;
+				return substr($str, 0, -1 * $sub);
+			}
+			return $str;
+		}
+
+		private function empty_row() {
+				$this->setX(8);
+				$this->SetFont('Arial', '', 8);
+				$this->Cell(16.2, 5.3, '', 1, 0);
+				$this->Cell(15.1, 5.3, '', 1, 0);
+				$this->Cell(19.6, 5.3, '', 1, 0, 'C');
+				$this->Cell(35.2, 5.3, '', 1, 0, 'C');
+				$this->Cell(32.57, 5.3, '', 1, 0, 'C');
+				$this->Cell(27.54, 5.3, '', 1, 0, 'C');
+				$this->Cell(27.25, 5.3, '', 1, 0, 'C');
+				$this->Cell(19.6, 5.3, '', 1, 0, 'C');
+				$this->Cell(12.43, 5.3, '', 1, 0, 'C');
+				$this->Cell(18.8, 5.3, '', 1, 0, 'C');
+				$this->Cell(18.53, 5.3, '', 1, 0, 'C');
+				$this->Cell(18.8, 5.3, '', 1, 0, 'C');
+				$this->Cell(18.5, 5.3, '', 1, 1, 'C');
 		}
 
 		public function Header() {
@@ -142,18 +198,18 @@
 			$this->SetFont('Arial', 'B', 11);
 			$txt = urldecode($this->em("Total"));
 			$this->Cell(173.45, 5.3, $txt, 1, 0);
-			$this->SetFont('Arial', '', 10);
-			$this->Cell(19.6, 5.3, $this->mht_val, 1, 0, 'C');
+			$this->SetFont('Arial', '', 8);
+			$this->Cell(19.6, 5.3, number_format($this->mht_val, 2, '.', ' '), 1, 0, 'R');
 			$this->Cell(12.43, 5.3, '', 1, 0, '', 1);
-			$this->Cell(18.8, 5.3, $this->tva_val, 1, 0, 'C');
-			$this->Cell(18.53, 5.3, $this->ttc_val, 1, 0, 'C');
+			$this->Cell(18.8, 5.3, number_format($this->tva_val, 2, '.', ' '), 1, 0, 'R');
+			$this->Cell(18.53, 5.3, number_format($this->ttc_val, 2, '.', ' '), 1, 0, 'R');
 			$this->Cell(37.3, 5.3, '', 1, 1, '', 1);
 			$this->setX(8);
 			$this->SetFont('Arial', 'B', 11);
 			$txt = urldecode($this->em("Total de la TVA déductible après application du prorata visé à l’article 104 du CGI"));
 			$this->Cell(205.5, 5.3, $txt, 1, 0);
-			$this->SetFont('Arial', '', 10);
-			$this->Cell(18.8, 5.3, $this->tva_val, 1, 0, 'C');
+			$this->SetFont('Arial', '', 8);
+			$this->Cell(18.8, 5.3, number_format($this->pages_total, 2, '.', ' '), 1, 0, 'R');
 			$this->Cell(55.8, 5.3, '', 1, 1, '', 1);
 			$this->mht_val = 0;
 			$this->tva_val = 0;
@@ -309,6 +365,12 @@
 		    $word = str_replace("ú","%FA",$word);
 		    $word = str_replace("û","%FB",$word);
 		    $word = str_replace("ü","%FC",$word);
+		    $word = str_replace("È","%C8",$word);
+		    $word = str_replace("É","%C9",$word);
+		    $word = str_replace("Ê","%CA",$word);
+		    $word = str_replace("À","%C0",$word);
+		    $word = str_replace("Á","%C1",$word);
+		    $word = str_replace("Â","%C2",$word);
 		    return $word;
 		}
 

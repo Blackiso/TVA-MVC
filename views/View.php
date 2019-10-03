@@ -3,13 +3,14 @@
 		class View {
 
 			private static $errors = [
-				'password' => 'Password Requires a Mix of Numbers and Letters Min Characters 5 and Max Characters 20',
-				'email_used' => 'Email already used!',
-				'account_blocked' => 'Your account is blocked!',
-				'authentication' => 'Authentication Error!',
-				'company_set' => 'Company already set!',
-				'payment_already_captured' => 'Error payment already captured!',
-				'payment_error' => 'Payment Error!'
+				'password' => 'Le mot de passe requiert un mélange de chiffres et de lettres. Caractères min. 5 et Max. Caractères 20.',
+				'email_used' => 'Adresse Email déjà utilisée!',
+				'account_blocked' => 'Votre compte est bloqué!',
+				'authentication' => "Erreur d'authentification!",
+				'company_set' => 'Société déjà définie!',
+				'payment_already_captured' => 'Erreur de paiement déjà capturée!',
+				'payment_error' => 'Erreur de paiement!',
+				'not_refundable' => 'Non remboursable!'
 			];
 
 			public static function json($data) {

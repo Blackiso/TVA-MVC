@@ -15,6 +15,7 @@
 				if (!$plan) View::bad_request();
 
 				if ($data->months == 0 || $data->months > 12) View::bad_request();
+				$plan['price'] = self::convert_currency($plan['price'], 'MAD', 'EUR');
 				$plan['price'] = $plan['price'] * $data->months;
 
 				$paypal = new \PayPal();
@@ -25,7 +26,7 @@
 							"reference_id" => $plan['reference_id'],
 							"amount" => [
 								"value" => $plan['price'],
-								"currency_code" => $plan['currency_code']
+								"currency_code" => 'EUR'
 							],
 						]
 					],
@@ -59,7 +60,8 @@
 
 				$capture_ = $capture->purchase_units[0]->payments->captures[0];
 				$reference_id = $capture->purchase_units[0]->reference_id;
-				$base_price = PaymentModel::get_plan($reference_id)['price'];
+				$price_mad = PaymentModel::get_plan($reference_id)['price'];
+				$base_price = self::convert_currency($price_mad, 'MAD', 'EUR');
 				$duration = $capture_->amount->value / $base_price;
 				$expire_date = strtotime("+$duration months");
 				$expire_date = date("Y-m-d H:i:s", $expire_date);
@@ -68,8 +70,8 @@
 					'payment_id' => $capture->id,
 					'capture_id' => $capture_->id,
 					'master_id' => self::$user->master_id,
-					'payment_amount' => $capture_->amount->value,
-					'payment_currency' => $capture_->amount->currency_code,
+					'payment_amount' => $price_mad * $duration,
+					'payment_currency' => 'MAD',
 					'account_type' => 'premium',
 					'payment_time' => date('Y-m-d h:i:s'),
 					'full_name' => $capture->payer->name->given_name ." ". $capture->payer->name->surname,
@@ -96,6 +98,42 @@
 			public static function GET_history() {
 				$response = PaymentModel::get_history(self::$user->master_id);
 				View::response($response);
+			}
+
+			public static function GET_refund() {
+				$payment_id = self::$params['payment-id'];
+				$active_plan = PaymentModel::get_active_plan(self::$user->user_id);
+				if ($active_plan['payment_id'] !== $payment_id) View::bad_request();
+
+				$start = strtotime($active_plan['start_date']);
+				$now = strtotime("now");
+				if ($now > ($start + 7 * 24 * 60 * 60 * 1000)) View::throw_error('not_refundable');
+				if (PaymentModel::check_refund($payment_id)) View::throw_error('not_refundable');
+
+				$capture_id = PaymentModel::capture_id($payment_id);
+				$paypal = new \PayPal();
+				$refund = $paypal->refund($capture_id);
+
+				if (isset($refund->status)) {
+					if (isset($refund->status) && $refund->status == 'PENDING' || $refund->status == 'COMPLETED') {
+						PaymentModel::refunded_payment($payment_id);
+						self::$user->reset_account();
+						View::response();
+					}else {
+						View::throw_error('not_refundable');
+					}
+				}else {
+					View::throw_error('not_refundable');
+				}
+			}
+
+			private static function convert_currency($amount, $x, $y){
+				$x_y = urlencode($x."_".$y);
+				$json = file_get_contents("https://free.currconv.com/api/v7/convert?q=$x_y&compact=ultra&apiKey=dc385654f5f4605a9606");
+				$obj = json_decode($json, true);
+				$val = floatval($obj[$x_y]);
+				$total = $val * $amount;
+				return number_format($total, 2, '.', '');
 			}
 		}
 	}

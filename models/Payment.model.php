@@ -34,6 +34,11 @@
 				$result = self::$database->select($qr);
 				return empty($result) ? false : $result['expire_date'];
 			}
+
+			public static function get_active_plan($master_id) {
+				$qr = self::select_query_constructor(['payment_id','start_date'], self::$active_plans, ['master_id' => $master_id]);
+				return self::$database->select($qr);
+			}
 			
 			public static function set_account_type($type, $master_id) {
 				$qr = self::update_query_constructor(['account_type' => $type], self::$master_accounts, ['user_id' => $master_id]);
@@ -46,8 +51,25 @@
 				return $result['account_type'];
 			}
 
+			public static function refunded_payment($payment_id) {
+				$qr = self::update_query_constructor(['refunded' => 1], self::$payments, ['payment_id' => $payment_id]);
+				return self::$database->insert($qr);
+			}
+
 			public static function check_payment($token) {
 				return self::check_row(self::$payments, ['payment_id' => $token]);
+			}
+
+			public static function check_refund($payment_id) {
+				$qr = self::select_query_constructor(['refunded'], self::$payments, ['payment_id' => $payment_id]);
+				$result = self::$database->select($qr);
+				return $result['refunded'];
+			}
+
+			public static function capture_id($payment_id) {
+				$qr = self::select_query_constructor(['capture_id'], self::$payments, ['payment_id' => $payment_id]);
+				$result = self::$database->select($qr);
+				return $result['capture_id'];
 			}
 
 			public static function get_history($master_id) {

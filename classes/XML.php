@@ -65,7 +65,7 @@ class Array2XML
      * @param bool   $standalone
      * @param bool   $format_output
      */
-    public static function init($version = '1.0', $encoding = 'utf-8', $standalone = false, $format_output = true)
+    public static function init($version = '1.0', $encoding = 'UTF-8', $standalone = false, $format_output = true)
     {
         self::$xml = new DomDocument($version, $encoding);
         self::$xml->xmlStandalone = $standalone;

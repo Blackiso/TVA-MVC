@@ -20,7 +20,7 @@
 
 			public static function get_bills($file_id, $month, $last_item) {
 				$bills_query = self::pagination(
-					['id', 'nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp'], 
+					['id', 'nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp', 'bill_type'], 
 					self::$table, 
 					['file_id' => $file_id, 'month' => $month],
 					$last_item,
@@ -45,6 +45,19 @@
 					self::$table, 
 					['file_id' => $file_id, 'month' => $month]
 				);
+				$bills_query .= " ORDER BY tau ASC";
+				$result = self::$database->select($bills_query);
+				if (!empty($result) && !isset($result[0])) $result = [$result];
+				return $result;
+			}
+
+			public static function get_all_bills_by_type($file_id, $month, $type) {
+				$bills_query = self::select_query_constructor(
+					['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp'], 
+					self::$table, 
+					['file_id' => $file_id, 'month' => $month, 'bill_type' => $type]
+				);
+				$bills_query .= " ORDER BY tau ASC";
 				$result = self::$database->select($bills_query);
 				if (!empty($result) && !isset($result[0])) $result = [$result];
 				return $result;
@@ -58,6 +71,11 @@
 					$check_query = "SELECT b.id FROM ".self::$table." AS b INNER JOIN ".self::$files_table." AS f ON b.file_id = f.id INNER JOIN ".self::$users_companies_table." AS c ON f.company_id = c.id WHERE c.user_id = '$user_id' AND b.id IN ($bill_id) AND f.deleted = 0";
 				}
 				return !empty(self::$database->select($check_query));
+			}
+
+			public static function get_order_start($month, $file_id) {
+				$qr = "SELECT COUNT(id) AS order_start FROM bills WHERE month < $month AND file_id = '$file_id'";
+				return self::$database->select($qr)['order_start'];
 			}
 
 			public static function update_bill($data, $bill_id) {

@@ -38,6 +38,12 @@
 				return self::$database->select($files_query);
 			}
 
+			public static function update_last_modified($file_id) {
+				$time = date('Y-m-d h:i:s');
+				$update = self::update_query_constructor(['last_modified' => $time], self::$table, ['id' => $file_id]);
+				self::$database->update($update);
+			}
+
 			public static function update_file($data, $file_id) {
 				$update = self::update_query_constructor($data, self::$table, ['id' => $file_id]);
 				self::$database->update($update);
@@ -69,6 +75,19 @@
 				$result = self::$database->select($check_query);
 				if (!empty($result && !$return) && !isset($result[0])) $result = [$result];
 				return  $return ? $result : self::process_result($result, $files_id);
+			}
+
+			public static function get_last_file($company_id) {
+				$query = self::select_query_constructor(['id', 'type'], self::$table, ['company_id' => $company_id, 'deleted' => 0]);
+				$query .= " ORDER BY id DESC LIMIT 1";
+				return self::$database->select($query);
+			}
+
+			public static function get_stats($file_id) {
+				$query = "SELECT ROUND(SUM(tva), 2) AS total_tva, month FROM bills WHERE file_id = '$file_id' GROUP BY month";
+				$result = self::$database->select($query);
+				if (!empty($result) && !isset($result[0])) $result = [$result];
+				return $result;
 			}
 
 			private static function process_result($result, $files_id) {

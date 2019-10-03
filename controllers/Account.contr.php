@@ -42,8 +42,8 @@
 			public static function GET_index() {
 				$data = AccountModel::plan_details(self::$user->master_id);
 				$exp = strtotime($data['expire_date']);
-				$data['start_date'] = self::convertFormat($data['start_date']);
-				$data['expire_date'] = self::convertFormat($data['expire_date']);
+				$data['start_date'] = mb_convert_encoding(self::convertFormat($data['start_date']), "UTF-8", "HTML-ENTITIES");
+				$data['expire_date'] = mb_convert_encoding(self::convertFormat($data['expire_date']), "UTF-8", "HTML-ENTITIES");
 				$data['time_left'] = (int)(($exp - time())/86400);
 				View::response($data);
 			}

@@ -14,12 +14,13 @@
 				if (!self::check_data($data, ['month', 'bills'])) View::bad_request();
 				if (sizeof($data->bills) > 5 || sizeof($data->bills) == 0) View::bad_request();
 				foreach ($data->bills as $key => $value) {
-					if (!self::check_data($value, ['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp'])) {
+					if (!self::check_data($value, ['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp', 'bill_type'])) {
 						View::bad_request();
 					}
 				}
 
 				self::check_file_and_month($file_id, $data->month);
+				FilesModel::update_last_modified($file_id);
 
 				$ids = BillsModel::generate_ids(sizeof($data->bills));
 				if (!empty($ids) && !isset($ids[0])) $ids = [$ids];
@@ -84,6 +85,37 @@
 				if (!BillsModel::check_bill($ids, self::$user->user_id, self::$user->user_type)) View::bad_request();
 				BillsModel::delete_bills($ids);
 				View::response();
+			}
+
+			public static function GET_table() {
+				$file_id = self::$params['file-id'];
+				$month = self::$params['month']; 
+				self::check_file_and_month($file_id, $month);
+				$bills = BillsModel::get_all_bills_by_type($file_id, $month, 'other');
+				$transport = BillsModel::get_all_bills_by_type($file_id, $month, 'transport');
+				$bank = BillsModel::get_all_bills_by_type($file_id, $month, 'bank');
+				$arrays = [
+					20 => [],
+					14 => [],
+					10 => [],
+					7  => [],
+					'bank' => $bank,
+					'transport' => $transport
+				];
+
+				foreach ($bills as $key => $value) {
+					array_push($arrays[$bills[$key]['tau']], $value);
+				}
+
+				foreach ($arrays as $key => $value) {
+					$total = 0;
+					foreach ($value as $value) {
+						$total = $total + $value['tva'];
+					}
+					$arrays[$key] = $total;
+				}
+
+				View::response($arrays);
 			}
 
 			private static function check_file_and_month($file_id, $month) {
