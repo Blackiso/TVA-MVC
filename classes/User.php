@@ -17,6 +17,7 @@
 		private $secret;
 		private $user_type;
 		private $blocked;
+		private $active;
 
 		function __construct() {
 			AuthModel::init();
@@ -30,6 +31,7 @@
 			$this->account_type = $data->account_type ?? "user";
 			$this->user_type = $data->user_type;
 			$this->secret = $data->secret;
+			$this->active = false;
 			return true;
 		}
 
@@ -61,6 +63,7 @@
 				$this->password = $data->password;
 				$this->account_type = $data->account_type ?? 'user';
 				$this->blocked = $data->blocked ?? null;
+				$this->active = $data->active ?? null;
 				return true;
 			}else {
 				return false;
@@ -119,6 +122,7 @@
 			$payload->nam = $this->name;
 			$payload->eml = $this->email;
 			$payload->typ = $this->account_type;
+			$payload->act = (bool)$this->active;
 			return $this->sign_JWT($payload, $this->get_secret());
 		}
 
@@ -128,7 +132,7 @@
 		}
 
 		private function check_data($data) {
-			$keys = ['uid', 'mid', 'nam', 'eml', 'typ', 'exp', 'rnw'];
+			$keys = ['uid', 'mid', 'nam', 'eml', 'typ', 'exp', 'rnw', 'act'];
 			if (is_object($data)) {
 				foreach($data as $key => $val) {
 					if (!in_array($key, $keys)) {
@@ -140,11 +144,18 @@
 		}
 
 		private function get_new_info() {
-			$data = AuthModel::get_info($this->user_id, $this->user_type, ['email', 'name', 'account_type', 'secret']);
+			$data = ['email', 'name', 'account_type', 'secret'];
+			if ($this->user_type == 'master') array_push($data, 'active');
+			$data = AuthModel::get_info($this->user_id, $this->user_type, $data);
 			$this->name = $data['name'];
 			$this->email = $data['email'];
 			$this->secret = $data['secret'];
 			$this->account_type = $data['account_type'];
+			if (isset($data['active'])) {
+				$this->active = (bool)$data['active'];
+			}else {
+				$this->active = null;
+			}
 		}
 
 		public function __get($name) {
@@ -200,7 +211,8 @@
 				'user_id' => $this->user_id,
 				'name' => $this->name,
 				'email' => $this->email,
-				'type' => $this->account_type
+				'type' => $this->account_type,
+				'active' => (bool)$this->active
 			];
 			return $info;
 		}

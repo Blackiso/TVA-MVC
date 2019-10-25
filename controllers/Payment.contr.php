@@ -129,9 +129,14 @@
 
 			private static function convert_currency($amount, $x, $y){
 				$x_y = urlencode($x."_".$y);
-				$json = file_get_contents("https://free.currconv.com/api/v7/convert?q=$x_y&compact=ultra&apiKey=dc385654f5f4605a9606");
-				$obj = json_decode($json, true);
-				$val = floatval($obj[$x_y]);
+				$json = @file_get_contents("https://free.currconv.com/api/v7/convert?q=$x_y&compact=ultra&apiKey=dc385654f5f4605a9606");
+				if ($json) {
+					$obj = json_decode($json, true);
+					$val = floatval($obj[$x_y]);
+					PaymentModel::set_euro($val);
+				}else {
+					$val = PaymentModel::get_euro();
+				}
 				$total = $val * $amount;
 				return number_format($total, 2, '.', '');
 			}

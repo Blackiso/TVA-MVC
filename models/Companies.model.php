@@ -23,6 +23,23 @@
 				return $result->query;
 			}
 
+			public static function add_users_to_multiple_company($user_id, $ids) {
+				$qr = "INSERT INTO ".self::$user_table." (id, user_id) VALUES ";
+				$array = [];
+				for ($i = 0; $i < sizeof($ids); $i++) { 
+					$x = "('".$ids[$i]['id']."', '$user_id')";
+					array_push($array, $x);
+				}
+				$qr .= implode(', ', $array);
+				$result = self::$database->insert($qr);
+				return $result->query;
+			}
+
+			public static function delete_duplicates() {
+				$qr = "DELETE t1 FROM ".self::$user_table." t1 INNER JOIN ".self::$user_table." t2 WHERE t1.ai < t2.ai AND t1.id = t2.id AND t1.user_id = t2.user_id";
+				self::$database->insert($qr);
+			}
+
 			public static function check_company($company_id, $master_id) {
 				return self::check_row(self::$table, ['id' => $company_id, 'master_id' => $master_id, 'deleted' => 0]);
 			}
@@ -72,6 +89,13 @@
 				}
 				$custom_query .= " GROUP BY id ASC LIMIT 20";
 				return self::$database->select($custom_query);
+			}
+
+			public static function get_all_companies($master_id) {
+				$qr = self::select_query_constructor(['id'], self::$table, ['master_id' => $master_id, 'deleted' => 0]);
+				$result = self::$database->select($qr);
+				if (!empty($result) && !isset($result[0])) $result = [$result];
+				return $result;
 			}
 
 			public static function delete_company($company_id) {

@@ -26,7 +26,7 @@
 			}
 			
 			public static function get_users_by_company($company_id, $master_id) {
-				$users_query = "SELECT u.user_id, u.name, u.email, u.blocked FROM ".self::$user." AS u INNER JOIN ".self::$companies_table." AS c WHERE u.user_id = c.user_id AND c.id = '$company_id' AND u.master_id = '$master_id' ORDER BY user_id DESC";
+				$users_query = "SELECT u.user_id, u.name, u.email, u.blocked, u.wild FROM ".self::$user." AS u INNER JOIN ".self::$companies_table." AS c WHERE u.user_id = c.user_id AND c.id = '$company_id' AND u.master_id = '$master_id' ORDER BY user_id DESC";
 				return self::$database->select($users_query);
 			}
 

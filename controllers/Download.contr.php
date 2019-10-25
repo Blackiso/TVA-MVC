@@ -20,7 +20,7 @@
 				$main = [
 					"identifiantFiscal" => $file['i_f'],
 					"annee" => $file['year'],
-					"periode" => $month,
+					"periode" => $file['type'] == "quarterly" ? $month/3 : $month,
 					"regime" => $type,
 					"releveDeductions" => [
 						"rd" => []

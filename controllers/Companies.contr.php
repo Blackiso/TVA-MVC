@@ -14,6 +14,7 @@
 				if (!self::check_data($company_details, ['company_name', 'activity', 'i_f', 'phone', 'address', 'email'])) {
 					View::bad_request();
 				}
+				$company_details->i_f = str_replace(' ', '', $company_details->i_f);
 				if (strlen($company_details->i_f) > 8) View::bad_request();
 				$company_details->master_id = self::$user->master_id;
 				$company_details->id = CompaniesModel::generate_id();
@@ -43,6 +44,8 @@
 				$company_id = self::$params['company-id'];
 				self::check_company($company_id);
 				$response = CompaniesModel::get_company($company_id);
+				$response['i_f'] = "#-#_prefix_".$response['i_f'];
+				$response['phone'] = "#-#_prefix_".$response['phone'];
 				View::response($response);
 			}
 
@@ -50,7 +53,11 @@
 				$company_id = self::$params['company-id'];
 				$data = self::$request->body;
 				if (!self::check_master_company($company_id)) View::bad_request();
-				if (!self::check_data($data, ['company_name', 'address', 'phone', 'email'], false)) View::bad_request();
+				if (!self::check_data($data, ['company_name', 'activity', 'i_f', 'address', 'phone', 'email'], false)) View::bad_request();
+				if (isset($data->i_f)) {
+					$data->i_f = str_replace(' ', '', $data->i_f);
+					if (strlen($data->i_f) > 8) View::bad_request();
+				}
 				CompaniesModel::update_company($data, $company_id);
 				View::response();
 			}
@@ -78,8 +85,14 @@
 			public static function GET_stats() {
 				$company_id = self::$params['company-id'];
 				self::check_company($company_id);
+
 				$file = FilesModel::get_last_file($company_id);
-				$stats = FilesModel::get_stats($file['id']);
+				if (empty($file)) {
+					$file['type'] = 'monthly';
+					$stats = [];
+				}else {
+					$stats = FilesModel::get_stats($file['id']);
+				}
 
 				if ($file['type'] == "monthly") {
 					$stats = self::calculate_monlty($stats);

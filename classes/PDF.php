@@ -66,22 +66,22 @@
 					$bill = (object) $full_bills[$i];
 					$this->setX(8);
 					$this->SetFont('Arial', '', 8);
-					$this->Cell(16.2, 5.3, $order+1, 1, 0);
-					$this->Cell(15.1, 5.3, $this->resize($bill->nfa, 7), 1, 0);
-					$this->Cell(19.6, 5.3, $bill->ddf, 1, 0, 'C');
+					$this->BreakCell(16.2, 5.3, $order+1, 1, 0);
+					$this->BreakCell(15.1, 5.3, $bill->nfa, 1, 0);
+					$this->BreakCell(19.6, 5.3, $bill->ddf, 1, 0, 'C');
 					$nome = urldecode($this->em($bill->ndf));
-					$this->Cell(35.2, 5.3, $this->resize($nome, 23), 1, 0);
-					$this->Cell(32.57, 5.3, $bill->iff, 1, 0);
-					$this->Cell(27.54, 5.3, $bill->ice, 1, 0);
+					$this->BreakCell(35.2, 5.3, $nome, 1, 0);
+					$this->BreakCell(32.57, 5.3, $bill->iff, 1, 0);
+					$this->BreakCell(27.54, 5.3, $bill->ice, 1, 0);
 					$dbs = urldecode($this->em($bill->dbs));
-					$this->Cell(27.25, 5.3, $this->resize($dbs, 13), 1, 0);
-					$this->Cell(19.6, 5.3, number_format($bill->mht, 2, '.', ' '), 1, 0, 'R');
-					$this->Cell(12.43, 5.3, number_format($bill->tau, 2, '.', ' '), 1, 0, 'R');
-					$this->Cell(18.8, 5.3, number_format($bill->tva, 2, '.', ' '), 1, 0, 'R');
-					$this->Cell(18.53, 5.3, number_format($bill->ttc, 2, '.', ' '), 1, 0, 'R');
+					$this->BreakCell(27.25, 5.3, $dbs, 1);
+					$this->BreakCell(19.6, 5.3, number_format($bill->mht, 2, '.', ' '), 1, 0, 'R');
+					$this->BreakCell(12.43, 5.3, number_format($bill->tau, 2, '.', ' '), 1, 0, 'R');
+					$this->BreakCell(18.8, 5.3, number_format($bill->tva, 2, '.', ' '), 1, 0, 'R');
+					$this->BreakCell(18.53, 5.3, number_format($bill->ttc, 2, '.', ' '), 1, 0, 'R');
 					$mode = urldecode($this->em($this->payment_mode[$bill->mdp]));
-					$this->Cell(18.8, 5.3, $this->resize($mode, 8), 1, 0);
-					$this->Cell(18.5, 5.3, $bill->ddp, 1, 1, 'C');
+					$this->BreakCell(18.8, 5.3, $mode, 1, 0);
+					$this->BreakCell(18.5, 5.3, $bill->ddp, 1, 1, 'C');
 
 					$this->mht_val = $this->mht_val + (float) $bill->mht;
 					$this->tva_val = $this->tva_val + (float) $bill->tva;
@@ -94,14 +94,6 @@
 			}
 
 			$this->Output();
-		}
-
-		private function resize($str, $max) {
-			if (strlen($str) > $max) {
-				$sub = strlen($str) - $max;
-				return substr($str, 0, -1 * $sub);
-			}
-			return $str;
 		}
 
 		private function empty_row() {

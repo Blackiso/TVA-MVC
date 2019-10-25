@@ -10,7 +10,7 @@
 			
 			public static function POST_index() {
 				$user_data = self::$request->body;
-				if(!self::check_data($user_data, ['email', 'password', 'company', 'name'])) {
+				if(!self::check_data($user_data, ['email', 'password', 'company', 'name', 'wild'])) {
 					View::bad_request();
 				}
 
@@ -40,10 +40,16 @@
 				$user_data->secret = self::generate_secret($user_data->email);
 				$user_data->password = self::encrypt_password($user_data->password, $user_data->secret);
 				$company_id = $user_data->company;
+				$wildcard = $user_data->wild;
 				unset($user_data->company);
 
 				if (UsersModel::add_user($user_data)) {
-					CompaniesModel::add_user_company($company_id, $user_data->user_id);
+					if ($wildcard) {
+						self::add_to_all_companies($user_data->user_id);
+					}else {
+						CompaniesModel::add_user_company($company_id, $user_data->user_id);
+					}
+					
 					$user_data->account_type = "user";
 					unset($user_data->password);
 					unset($user_data->secret);
@@ -78,6 +84,7 @@
 				if (!self::check_master_company($company_id)) View::bad_request();
 				if (!self::check_user_company($company_id, $user_id)) View::bad_request();
 				CompaniesModel::delete_company_from_user($company_id, $user_id);
+				UsersModel::update_user($user_id, ['wild' => 0]);
 				View::response();
 			}
 
@@ -108,7 +115,7 @@
 				$user_id = self::$params['user-id'];
 				$user_data = self::$request->body;
 				self::check_user($user_id);
-				if(!self::check_data($user_data, ['email', 'password', 'name'], false)) View::bad_request();
+				if(!self::check_data($user_data, ['email', 'password', 'name', 'wild'], false)) View::bad_request();
 				if (isset($user_data->email)) {
 					if (!self::filter_email($user_data->email)) {
 						View::bad_request();
@@ -125,7 +132,18 @@
 					$user_secret = explode('-', $user_secret)[0];
 					$user_data->password = self::encrypt_password($user_data->password, $user_secret);
 				}
-				UsersModel::update_user($user_id, $user_data);
+
+				if (isset($user_data->wild)) {
+					if ($user_data->wild) {
+						self::add_to_all_companies($user_id);
+					}else {
+						unset($user_data->wild);
+					}
+				}	
+
+				if (!empty((array)$user_data)) {
+					UsersModel::update_user($user_id, $user_data);
+				}
 				View::response();
 			}
 
@@ -144,6 +162,12 @@
 				if (!UsersModel::check_user($user_id, $master_id)) {
 					View::bad_request();
 				}
+			}
+
+			private static function add_to_all_companies($user_id) {
+				$companies = CompaniesModel::get_all_companies(self::$user->master_id);
+				CompaniesModel::add_users_to_multiple_company($user_id, $companies);
+				CompaniesModel::delete_duplicates();
 			}
 		}
 	}

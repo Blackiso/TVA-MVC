@@ -10,11 +10,14 @@
 				'company_set' => 'Société déjà définie!',
 				'payment_already_captured' => 'Erreur de paiement déjà capturée!',
 				'payment_error' => 'Erreur de paiement!',
-				'not_refundable' => 'Non remboursable!'
+				'not_refundable' => 'Non remboursable!',
+				'sendmail_error' => 'Email Error'
 			];
 
 			public static function json($data) {
-				return json_encode($data, JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES);
+				$data = json_encode($data, JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES);
+				echo str_replace('#-#_prefix_', '', $data);
+
 			}
 
 			public static function throw_error($err, $code = null) {

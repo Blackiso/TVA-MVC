@@ -11,10 +11,17 @@
 				$file_id = self::$params['file-id'];
 				$data = self::$request->body;
 
-				if (!self::check_data($data, ['month', 'bills'])) View::bad_request();
-				if (sizeof($data->bills) > 5 || sizeof($data->bills) == 0) View::bad_request();
+				if (!self::check_data($data, ['month', 'bills'])) {
+					View::bad_request();
+				}
+				if (sizeof($data->bills) > 5 || sizeof($data->bills) == 0) {
+					View::bad_request();
+				}
 				foreach ($data->bills as $key => $value) {
 					if (!self::check_data($value, ['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp', 'bill_type'])) {
+						View::bad_request();
+					}
+					if (strlen($value->ice) > 15 || strlen($value->iff) > 8) {
 						View::bad_request();
 					}
 				}
@@ -33,6 +40,8 @@
 					foreach ($data->bills as $bill) {
 						unset($bill->file_id);
 						unset($bill->month);
+						$bill->iff = (string) $bill->iff;
+						$bill->ice = (string) $bill->ice;
 					}
 					View::created($data->bills);
 				}
@@ -49,6 +58,10 @@
 				self::check_file_and_month($file_id, $month);
 				$result = BillsModel::get_bills($file_id, $month, $last_item_page);
 				if (!empty($result) && !isset($result[0])) $result = [$result];
+				foreach ($result as $i => $bill) {
+					$result[$i]['iff'] = "#-#_prefix_".$bill['iff'];
+					$result[$i]['ice'] = "#-#_prefix_".$bill['ice'];
+				}
 				View::response($result);
 			}
 
@@ -64,6 +77,16 @@
 				$data = self::$request->body;
 				if (!self::check_data($data, ['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp'], false)) {
 					View::bad_request();
+				}
+				if (isset($data->ice)) {
+					if (strlen($data->ice > 15)) {
+						View::bad_request();
+					}
+				}
+				if (isset($data->iff)) {
+					if (strlen($data->iff > 15)) {
+						View::bad_request();
+					}
 				}
 				if (!BillsModel::check_bill([$bill_id], self::$user->user_id, self::$user->user_type)) View::bad_request();
 				BillsModel::update_bill($data, $bill_id);

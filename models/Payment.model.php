@@ -72,6 +72,16 @@
 				return $result['capture_id'];
 			}
 
+			public static function set_euro($value) {
+				$qr = self::update_query_constructor(['euro' => $value], self::$plans, ['id' => 1]);
+				return self::$database->insert($qr);
+			}
+
+			public static function get_euro() {
+				$qr = self::select_query_constructor(['euro'], self::$plans, ['id' => 1]);
+				return self::$database->select($qr)['euro'];
+			}
+
 			public static function get_history($master_id) {
 				$qr = self::select_query_constructor(['payment_id','full_name', 'payer_email', 'account_type', 'payment_amount', 'payment_time', 'refunded'], self::$payments, ['master_id' => $master_id]);
 				$qr .= " ORDER BY id DESC LIMIT 5"; 

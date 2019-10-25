@@ -6,7 +6,7 @@
 
 		class Authentication extends Controller  { 
 
-			protected static function POST_login() {
+			public static function POST_login() {
 				$user_data = self::$request->body;
 				$user = new \User();
 
@@ -31,7 +31,7 @@
 				}
 			}
 
-			protected static function POST_register() {
+			public static function POST_register() {
 				$user = new \User();
 				$user_ip = self::$request->ip;
 				$user_agent = self::$request->agent;
@@ -82,13 +82,13 @@
 				}
 			}
 
-			protected static function POST_logout() {
+			public static function POST_logout() {
 				self::$user->revoke_secret();
 				self::$user->remove_JWT();
 				View::response();
 			}
 
-			protected static function GET_authenticate() {
+			public static function GET_authenticate() {
 				self::$user->new_jwt();
 				$info = self::$user->info;
 				View::response($info);

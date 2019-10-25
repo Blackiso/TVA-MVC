@@ -12,7 +12,7 @@
 
 		public  $return_url = "http://localhost:4200/capture-payment";
 		public  $return_url__ = "http://tva-angular.byethost13.com/capture-payment";
-		public  $return_url_ = "http://15.188.120.45/capture-payment";
+		public  $return_url_ = "https://www.paramanagers.com/capture-payment";
 
 		public  $approve_url = "https://www.sandbox.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";
 		public  $approve_url_ = "https://www.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";

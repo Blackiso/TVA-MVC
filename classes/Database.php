@@ -8,7 +8,7 @@
 		// private $db_name = "tva_app2";
 
 		private $db_user = "root";
-		private $db_pass = "8u1xfmUxPay2";
+		private $db_pass = "c1bTqmgsrwo9";
 		private $db_host = "localhost";
 		private $db_name = "tva_app2";
 

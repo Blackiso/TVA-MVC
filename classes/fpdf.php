@@ -769,6 +769,98 @@ function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false)
 	$this->x = $this->lMargin;
 }
 
+function BreakCell($w, $h, $txt, $border=0, $ln=0, $align='', $fill=false, $link='')
+{
+    // Output text with automatic or explicit line breaks
+    if(!isset($this->CurrentFont))
+        $this->Error('No font has been set');
+    $cw = &$this->CurrentFont['cw'];
+    if($w==0)
+        $w = $this->w-$this->rMargin-$this->x;
+    $wmax = ($w-2*$this->cMargin)*1000/$this->FontSize;
+    $s = str_replace("\r",'',$txt);
+    $nb = strlen($s);
+    if($nb>0 && $s[$nb-1]=="\n")
+        $nb--;
+
+//*** Since we only create one Cell, there is no need to remove bottom border 
+//*** code removed
+    $b = 0;
+    if($border)$b=$border;
+
+    $sep = -1;
+    $i = 0;
+    $j = 0;
+    $l = 0;
+    $ns = 0;
+    $nl = 1;
+// *** stop as one cell is set
+// *** prevents last line if there allready is a cell
+    $stop=false;
+    while($i<$nb && $stop===false)
+    {
+        // Get next character
+        $c = $s[$i];
+        if($c=="\n")
+        {
+            // Explicit line break
+            if($this->ws>0)
+            {
+                $this->ws = 0;
+                $this->_out('0 Tw');
+            }
+            $this->Cell($w,$h,substr($s,$j,$i-$j),$b,$ln,$align,$fill);
+// *** cell is set, so we stop
+// *** rest of code removed 
+            $stop=true;
+            break;
+        }
+// *** do not auto-break after space
+// *** code removed
+
+        $l += $cw[$c];
+        if($l>$wmax)
+        {
+// *** sep always is -1 if there is no "\n"
+// *** if/else removed
+            // Automatic line break
+            if($sep==-1)
+            {
+                if($i==$j)
+                    $i++;
+                if($this->ws>0)
+                {
+                    $this->ws = 0;
+                    $this->_out('0 Tw');
+                }
+//*** changed lenght $i-$j in $i-$j-3 to make space for 3 dots
+//*** added 3 dots
+            $this->Cell($w,$h,substr($s,$j,$i-$j),$b,$ln,$align,$fill);
+// *** cell is set, so we stop
+// *** rest of code removed 
+            $stop=true;
+            break;
+// *** cell is set, so we stop
+            }
+        }
+        else
+            $i++;
+    }
+    // Last chunk
+// *** only if no cell is set
+    if($stop===false){
+        if($this->ws>0)
+        {
+            $this->ws = 0;
+            $this->_out('0 Tw');
+        }
+//*** bottom border allready set
+//*** code removed
+        $this->Cell($w,$h,substr($s,$j,$i-$j),$b,$ln,$align,$fill);
+    }
+    // $this->x = $this->lMargin;
+}
+
 function Write($h, $txt, $link='')
 {
 	// Output text in flowing mode

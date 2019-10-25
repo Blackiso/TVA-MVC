@@ -71,7 +71,25 @@
 
 		public function get_body() {
 			$entity_body = file_get_contents('php://input');
-			return $this->json_strip_tags(json_decode($entity_body));
+			$body = $this->json_strip_tags(json_decode($entity_body));
+			$body = $this->rtrimthisfucker($body);
+			return $body;
+		}
+
+		private function rtrimthisfucker($x) {
+			$y = (array) $x;
+			foreach ($y as $key => $value) {
+				if (gettype($value) == "array" || gettype($value) == "object") {
+					if (gettype($x) == "object") {
+						$x->$key = $this->rtrimthisfucker($value);
+					}else {
+						$x[$key] = $this->rtrimthisfucker($value);
+					}
+				}else {
+					$x->$key = trim($value);
+				}
+			}
+			return $x;
 		}
 
 		public function get_JWT() {

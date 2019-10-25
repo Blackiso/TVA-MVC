@@ -158,7 +158,7 @@
 				'controller' => 'Companies',
 				'action' => 'stats',
 				'auth' => true,
-				'types' => ['premium', 'regular'],
+				'types' => ['regular', 'premium', 'user'],
 				'method' => 'GET'
 			],
 			/////////////////////////////////////////////
@@ -338,7 +338,47 @@
 				'auth' => true,
 				'types' => ['premium'],
 				'method' => 'GET'
-			]
+			],
+			[
+				'uri' => '/api/account/support',
+				'controller' => 'Account',
+				'action' => null,
+				'auth' => false,
+				'types' => [],
+				'method' => 'POST'
+			],
+			[
+				'uri' => '/api/account/email/send',
+				'controller' => 'Account',
+				'action' => 'send_email',
+				'auth' => true,
+				'types' => ['pending', 'premium', 'regular'],
+				'method' => 'POST'
+			],
+			[
+				'uri' => '/api/account/email/verify',
+				'controller' => 'account',
+				'action' => 'verify_email',
+				'auth' => true,
+				'types' => ['pending', 'premium', 'regular'],
+				'method' => 'POST'
+			],
+			[
+				'uri' => '/api/account/reset',
+				'controller' => 'Account',
+				'action' => 'reset_password',
+				'auth' => false,
+				'types' => [],
+				'method' => 'POST'
+			],
+			[
+				'uri' => '/api/account/reset',
+				'controller' => 'Account',
+				'action' => 'reset_password',
+				'auth' => false,
+				'types' => [],
+				'method' => 'PATCH'
+			],
 			/////////////////////////////////////////////
 		];
 
