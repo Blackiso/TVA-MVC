@@ -15,5 +15,10 @@
 				$qr = self::select_query_constructor(['duration', 'start_date', 'expire_date'], self::$active_plans, ['master_id' => $master_id]);
 				return self::$database->select($qr);
 			}
+
+			public static function get_user_data($data, $user_id) {
+				$qr = self::select_query_constructor($data, self::$table, ['user_id' => $user_id]);
+				return self::$database->select($qr);
+			}
 		}
 	}

@@ -2,6 +2,7 @@
 	
 	use Models\Authentication as AuthModel;
 	use Models\Payment as PaymentModel;
+	use Models\Account as AccountModel;
 
 	require_once('JWT.php');
 	
@@ -95,7 +96,7 @@
 		}
 
 		public function reset_account() {
-			PaymentModel::set_account_type('pending', $this->master_id);
+			AccountModel::update_account(['account_type' => 'pending', 'refund' => 0], $this->master_id);
 			$this->account_type = "pending";
 			$this->revoke_secret();
 		}

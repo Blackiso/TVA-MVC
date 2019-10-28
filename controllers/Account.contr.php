@@ -2,6 +2,7 @@
 
 	namespace Controllers {
 
+		use Models\Authentication as AuthModel;
 		use Models\Account as AccountModel;
 		use Views\View as View;
 
@@ -66,7 +67,7 @@
 				$user_id = self::$user->master_id;
 				if (self::$user->active) View::response();
 				$code = AuthModel::set_activation_code($user_id);
-				$name = self::$user->name;
+				$name = explode(' ', self::$user->name)[0];
 
 				$message = file_get_contents('email_templates/email_verification.html');
 				eval('$message = \''.$message.'\';');
@@ -105,6 +106,7 @@
 				$secret = $user->secret;
 				$hash = hash_hmac('sha256', $data->email."-".$ip."-".$time, $secret);
 				$URL  = self::$domain."?key=".$hash."&email=".$data->email."&cts=".$time;
+				$name = explode(' ', $user->name)[0];
 				$message = file_get_contents('email_templates/reset_password.html');
 				eval('$message = \''.$message.'\';');
 				$mailer = new \SendMail();
@@ -124,7 +126,7 @@
 				$secret = $user->secret;
 				$hash = hash_hmac('sha256', $data->email."-".$ip."-".$data->cts, $secret);
 				if ($hash !== $data->key) View::bad_request();
-				if (($time - $data->cts) > 900) View::bad_request();
+				if (($time - $data->cts) > 1800) View::bad_request();
 
 				if ($user->user_type !== "master") View::bad_request();
 

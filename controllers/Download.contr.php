@@ -45,8 +45,8 @@
 					$arr['mp'] = [
 						"id" => $bill['mdp']
 					];
-					$arr['dpai'] = $bill['ddp'];
-					$arr['dfac'] = $bill['ddf'];
+					$arr['dpai'] = self::reverseDate($bill['ddp']);
+					$arr['dfac'] = self::reverseDate($bill['ddf']);
 					array_push($main['releveDeductions']['rd'], $arr);
 					$order++;
 				}
@@ -93,6 +93,12 @@
 				$function = "check_".self::$user->user_type."_file";
 				$files_id = implode(',', $files_id);
 				return FilesModel::$function($files_id, self::$user->user_id, true);
+			}
+
+			private static function reverseDate($date) {
+				$arr = explode('-', $date);
+				$arr = array_reverse($arr);
+				return implode('-', $arr);
 			}
 		}
 	}

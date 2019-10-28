@@ -3,6 +3,7 @@
 	namespace Controllers {
 
 		use Models\Payment as PaymentModel;
+		use Models\Account as AccountModel;
 		use Views\View as View;
 
 		class Payment extends Controller  {
@@ -102,12 +103,15 @@
 
 			public static function GET_refund() {
 				$payment_id = self::$params['payment-id'];
+				$is_eligible = AccountModel::get_user_data(['refund'], self::$user->user_id)['refund'];
+				if (!$is_eligible) View::throw_error('not_refundable');
+
 				$active_plan = PaymentModel::get_active_plan(self::$user->user_id);
 				if ($active_plan['payment_id'] !== $payment_id) View::bad_request();
 
 				$start = strtotime($active_plan['start_date']);
 				$now = strtotime("now");
-				if ($now > ($start + 7 * 24 * 60 * 60 * 1000)) View::throw_error('not_refundable');
+				if ($now > ($start + 2 * 24 * 60 * 60 * 1000)) View::throw_error('not_refundable');
 				if (PaymentModel::check_refund($payment_id)) View::throw_error('not_refundable');
 
 				$capture_id = PaymentModel::capture_id($payment_id);
