@@ -18,7 +18,7 @@
 					View::bad_request();
 				}
 				foreach ($data->bills as $key => $value) {
-					if (!self::check_data($value, ['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp', 'bill_type'])) {
+					if (!self::check_data($value, ['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp', 'pro', 'code'])) {
 						View::bad_request();
 					}
 					if (strlen($value->ice) > 15 || strlen($value->iff) > 8) {
@@ -72,6 +72,13 @@
 				View::response($result);
 			}
 
+			public static function GET_dbs() {
+				$keyword = self::$request->querys['keyword'] ?? View::bad_request();
+				$result = BillsModel::get_dbs($keyword);
+				if (!empty($result) && !isset($result[0])) $result = [$result];
+				View::response($result);
+			}
+
 			public static function PATCH_index() {
 				$bill_id = self::$params['bill-id'];
 				$data = self::$request->body;
@@ -114,31 +121,8 @@
 				$file_id = self::$params['file-id'];
 				$month = self::$params['month']; 
 				self::check_file_and_month($file_id, $month);
-				$bills = BillsModel::get_all_bills_by_type($file_id, $month, 'other');
-				$transport = BillsModel::get_all_bills_by_type($file_id, $month, 'transport');
-				$bank = BillsModel::get_all_bills_by_type($file_id, $month, 'bank');
-				$arrays = [
-					20 => [],
-					14 => [],
-					10 => [],
-					7  => [],
-					'bank' => $bank,
-					'transport' => $transport
-				];
-
-				foreach ($bills as $key => $value) {
-					array_push($arrays[$bills[$key]['tau']], $value);
-				}
-
-				foreach ($arrays as $key => $value) {
-					$total = 0;
-					foreach ($value as $value) {
-						$total = $total + $value['tva'];
-					}
-					$arrays[$key] = $total;
-				}
-
-				View::response($arrays);
+				$bills = BillsModel::get_all_bills_by_type($file_id, $month);
+				View::response($bills);
 			}
 
 			private static function check_file_and_month($file_id, $month) {

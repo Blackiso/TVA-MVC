@@ -47,6 +47,8 @@
 					];
 					$arr['dpai'] = self::reverseDate($bill['ddp']);
 					$arr['dfac'] = self::reverseDate($bill['ddf']);
+					if ($bill['pro'] !== '100') $arr['prorata'] = $bill['pro'];
+					
 					array_push($main['releveDeductions']['rd'], $arr);
 					$order++;
 				}
@@ -55,7 +57,7 @@
 				$xx = $xml::createXML("DeclarationReleveDeduction", $main);
 				$xx = str_replace('standalone="no"', '', $xx->saveXML());
 				header('Content-Type: application/xml');
-				// header('Content-Disposition: attachment; filename="'.$file_name_full.'"');
+				header('Content-Disposition: attachment; filename="'.$file_name_full.'"');
 				View::plain_response($xx);
 			}
 

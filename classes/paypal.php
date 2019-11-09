@@ -10,17 +10,21 @@
 		private $sandbox_link = "https://api.sandbox.paypal.com";
 		public  $cancel_url = "http://tva-app.test/cancel";
 
-		public  $return_url = "http://localhost:4200/capture-payment";
+		public  $return_url_ = "http://localhost:4200/capture-payment";
 		public  $return_url__ = "http://tva-angular.byethost13.com/capture-payment";
-		public  $return_url_ = "https://www.paramanagers.com/capture-payment";
+		public  $return_url = "https://www.paramanagers.com/capture-payment";
 
-		public  $approve_url = "https://www.sandbox.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";
-		public  $approve_url_ = "https://www.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";
+		public  $approve_url_ = "https://www.sandbox.paypal.com/webapps/xoonboarding?token={token}&country.x=US&locale.x=en_US#/checkout/guest";
+		public  $approve_url = "https://www.paypal.com/webapps/xoonboarding?token={token}&country.x=MA&locale.x=fr_FR#/checkout/guest";
 
 		private $link;
-		private $mode = "sandbox";
-		private $client_id = "AbxeS8PkMc-yNjzVL7-0Xlv4p0oHbmL3ZQ05VuXFKXtLA8vjYyRufqhEjvwr5zcu7BaLyP5eNz8cK5Nh";
-		private $client_secret = "EPNIPKaG5msoKv-9eyGsqW47vlxioBVYzWXecbMTwY3O3BxsgfMnpltDIelZ0VDWe4L_JDiAAQC-xvsx";
+		private $mode = "live";
+		private $client_id_ = "AbxeS8PkMc-yNjzVL7-0Xlv4p0oHbmL3ZQ05VuXFKXtLA8vjYyRufqhEjvwr5zcu7BaLyP5eNz8cK5Nh";
+		private $client_secret_ = "EPNIPKaG5msoKv-9eyGsqW47vlxioBVYzWXecbMTwY3O3BxsgfMnpltDIelZ0VDWe4L_JDiAAQC-xvsx";
+
+		private $client_id = "ARMtvCvD-4ag1FjN1YCniDu3yHlrDc_WJ_e-1zn0Fx8MOSTOMWRTEoN5rXA9jDFUnvdkaHb2mtnthu2a";
+		private $client_secret = "EHOdFVcfRlRIwXB5_vSYgphmt3XWyRy6A7YOss6O020YyjnXXLxY1ii2rg2pbPYHtsihUu7zF5wAb-f_";
+
 		private $api_token;
 
 		function __construct() {
@@ -30,8 +34,8 @@
 		}
 
 		public function get_token() {
-			$filename_ = "/opt/bitnami/apache2/htdocs/backend/paypal-token.dat";
-			$filename = "paypal-token.dat";
+			$filename = "/opt/bitnami/apache2/htdocs/backend/paypal-token.dat";
+			$filename_ = "paypal-token.dat";
 			$file = fopen($filename, "r+");
 			$file_data = fread($file, filesize($filename));
 			$file_data = json_decode($file_data);

@@ -238,6 +238,14 @@
 				'method' => 'GET'
 			],
 			[
+				'uri' => '/api/bills/dbs',
+				'controller' => 'Bills',
+				'action' => 'dbs',
+				'auth' => true,
+				'types' => ['regular', 'premium', 'user'],
+				'method' => 'GET'
+			],
+			[
 				'uri' => '/api/bills/:bill-id',
 				'controller' => 'Bills',
 				'action' => null,

@@ -20,7 +20,7 @@
 
 			public static function get_bills($file_id, $month, $last_item) {
 				$bills_query = self::pagination(
-					['id', 'nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp', 'bill_type'], 
+					['id', 'nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp', 'code', 'pro'], 
 					self::$table, 
 					['file_id' => $file_id, 'month' => $month],
 					$last_item,
@@ -41,7 +41,7 @@
 
 			public static function get_all_bills($file_id, $month) {
 				$bills_query = self::select_query_constructor(
-					['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp'], 
+					['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp', 'pro'], 
 					self::$table, 
 					['file_id' => $file_id, 'month' => $month]
 				);
@@ -51,13 +51,8 @@
 				return $result;
 			}
 
-			public static function get_all_bills_by_type($file_id, $month, $type) {
-				$bills_query = self::select_query_constructor(
-					['nfa', 'ddf', 'ndf', 'iff', 'ice', 'dbs', 'mht', 'tau', 'tva', 'ttc', 'mdp', 'ddp'], 
-					self::$table, 
-					['file_id' => $file_id, 'month' => $month, 'bill_type' => $type]
-				);
-				$bills_query .= " ORDER BY tau ASC";
+			public static function get_all_bills_by_type($file_id, $month) {
+				$bills_query = "SELECT DISTINCT code, tau, TRUNCATE(SUM(tva), 2) as tva FROM ".self::$table." WHERE file_id = ".$file_id." AND month = ".$month." GROUP BY code, tau";
 				$result = self::$database->select($bills_query);
 				if (!empty($result) && !isset($result[0])) $result = [$result];
 				return $result;
@@ -95,6 +90,19 @@
 					self::$table,
 					['ndf' => $keyword]
 				);
+				$query = substr($query, 0, -8);
+				$query .= "GROUP BY iff LIMIT 15";
+				return self::$database->select($query);
+			}
+
+			public static function get_dbs($keyword) {
+				$query = self::search_query_constructor(
+					['dbs', 'tau', 'code'], 
+					self::$table,
+					['dbs' => $keyword]
+				);
+				$query = substr($query, 0, -8);
+				$query .= "GROUP BY dbs LIMIT 15";
 				return self::$database->select($query);
 			}
 
