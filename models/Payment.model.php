@@ -29,6 +29,11 @@
 				self::$database->insert($qr);
 			}
 
+			public static function set_active_plan($active_plan) {
+				$qr_active = self::insert_query_constructor($active_plan, self::$active_plans);
+				self::$database->insert($qr_active);
+			}
+
 			public static function get_expire_date($master_id) {
 				$qr = self::select_query_constructor(['expire_date'], self::$active_plans, ['master_id' => $master_id]);
 				$result = self::$database->select($qr);

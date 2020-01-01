@@ -86,12 +86,12 @@
 					View::bad_request();
 				}
 				if (isset($data->ice)) {
-					if (strlen($data->ice > 15)) {
+					if (strlen($data->ice) > 15) {
 						View::bad_request();
 					}
 				}
 				if (isset($data->iff)) {
-					if (strlen($data->iff > 15)) {
+					if (strlen($data->iff) > 8) {
 						View::bad_request();
 					}
 				}

@@ -388,6 +388,15 @@
 				'method' => 'PATCH'
 			],
 			/////////////////////////////////////////////
+			[
+				'uri' => '/api/logger',
+				'controller' => 'System',
+				'action' => 'logs',
+				'auth' => false,
+				'types' => [],
+				'method' => 'POST'
+			]
+			/////////////////////////////////////////////
 		];
 
 		protected function get_route($uri, $method) {

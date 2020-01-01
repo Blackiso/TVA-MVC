@@ -3,6 +3,7 @@
 
 		use Views\View as View;
 		use Models\Authentication as AuthModel;
+		use Models\Payment as PaymentModel;
 
 		class Authentication extends Controller  { 
 
@@ -35,7 +36,7 @@
 				$user = new \User();
 				$user_ip = self::$request->ip;
 				$user_agent = self::$request->agent;
-				$account_type = "pending";
+				$account_type = "premium";
 				$user_data = self::$request->body;
 
 				if (!self::check_data($user_data, ['name','email', 'password'])) {
@@ -75,6 +76,7 @@
 					$user_data->user_type = 'matser';
 					$user_data->secret = $secret;
 					if ($user->init_data($user_data)) {
+						self::set_free_plan($user_id);
 						$user->new_jwt(false);
 						$info = $user->info;
 						View::created($info);
@@ -96,6 +98,21 @@
 
 			private static function auth_error() {
 				View::throw_error('authentication');
+			}
+
+			private static function set_free_plan($user_id) {
+				$expire_date = strtotime("+7 days");
+				$expire_date = date("Y-m-d H:i:s", $expire_date);
+				$active_plan = [
+					'master_id' => $user_id,
+					'payment_id' => 'FREEMIUM',
+					'reference_id' => 'free_plan',
+					'duration' => 0,
+					'start_date' => date('Y-m-d h:i:s'),
+					'expire_date' => $expire_date
+				];
+
+				PaymentModel::set_active_plan($active_plan);
 			}
 		}
 	}
