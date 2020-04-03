@@ -19,11 +19,11 @@
 
 		private $link;
 		private $mode = "live";
-		private $client_id_ = "AbxeS8PkMc-yNjzVL7-0Xlv4p0oHbmL3ZQ05VuXFKXtLA8vjYyRufqhEjvwr5zcu7BaLyP5eNz8cK5Nh";
-		private $client_secret_ = "EPNIPKaG5msoKv-9eyGsqW47vlxioBVYzWXecbMTwY3O3BxsgfMnpltDIelZ0VDWe4L_JDiAAQC-xvsx";
+		private $client_id_ = "paypal secret...";
+		private $client_secret_ = "paypal secret...";
 
-		private $client_id = "ARMtvCvD-4ag1FjN1YCniDu3yHlrDc_WJ_e-1zn0Fx8MOSTOMWRTEoN5rXA9jDFUnvdkaHb2mtnthu2a";
-		private $client_secret = "EHOdFVcfRlRIwXB5_vSYgphmt3XWyRy6A7YOss6O020YyjnXXLxY1ii2rg2pbPYHtsihUu7zF5wAb-f_";
+		private $client_id = "paypal secret...";
+		private $client_secret = "paypal secret...";
 
 		private $api_token;
 
